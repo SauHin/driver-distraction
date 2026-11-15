@@ -1,0 +1,2 @@
+time_utc,git_commit,split,reason
+2026-11-15T14:15:28+00:00,f9c64dd1ee1f194f5fa8bceba556af10d9902dc4,statefarm_v2,"R1 replication, gate G1, seed 42, last epoch"

@@ -1,0 +1,9 @@
+{
+  "epoch": 19,
+  "lr": 7.34152255572697e-06,
+  "train_loss": 0.0002931529334531543,
+  "train_images": 15872,
+  "epoch_seconds": 187.05,
+  "images_per_second": 84.85,
+  "gpu_peak_memory_mb": 11098
+}

@@ -2,7 +2,7 @@
 
 Written on 2026-11-14 by Claude (Fable 5.2) in the planning session. The owner reviews it.
 Sources: `docs/starter/BRIEF.md`, `docs/starter/guideline.docx`, and `docs/LITERATURE.md`.
-This plan holds no result of this project. Each open number is `TBD`.
+Each result in this plan comes from a result file in `results/`. Each open number is `TBD`.
 
 ## 1. Goal
 
@@ -38,6 +38,8 @@ The research questions are:
 | D8 | 2026-11-15 | The development folds come from split v2. Split v1 is void for development. | Choice of the owner among 3 options. The owner approved the file on the same day. Section 4 gives the reason. |
 | D9 | 2026-11-15 | The replication runs R1 only. R2 and the emotion experiment E6 are void. | Choice of the owner among 3 options. The face crops and emotion labels of ViT-DD do not download. |
 | D10 | 2026-11-15 | R1 uses the ViT-DD config with no face input and no emotion head. | Choice of the owner among 3 options. The paper gives no recipe for R1. See `results/vitdd_recipe_check.md`. |
+| D11 | 2026-11-15 | R1 steps the scheduler after each epoch, as ViT-DD does with Lightning 1.7.7. Config key `sched_after_epoch`. | Choice of the owner. The first code stepped it at the start of each epoch. See `results/vitdd_recipe_check.md`. |
+| D12 | 2026-11-15 | R1 gives the position embedding the weight decay 0.1, as `ViTDDLM` does. Config key `wd_skip_list`. | Choice of the owner. The first R1 run gave it no weight decay. The owner stopped that run after epoch 10. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -230,7 +232,7 @@ Points to check before R1:
 - The `timm` name of the model gives different default weights in old and new versions. Use the weights of the 2022 code.
 - The paper text gives batch size 256. The public config gives 128. This plan uses the config.
 - Read the public data code and list each augmentation step. Find out whether the code flips images. Done in `results/vitdd_recipe_check.md`.
-- Record each difference from the recipe in the run folder.
+- Record each difference from the recipe in the run folder. Done in `results/replication/r1_vit_s42/recipe_differences.md`.
 
 Outputs in `results/replication/`:
 
@@ -242,6 +244,15 @@ Gate G1:
 
 - If G1 passes, start Phase 2.
 - If G1 fails, stop. Report the numbers to the owner. The owner decides the next step.
+
+Status of R1 and G1 on 2026-11-15:
+
+- R1 ran on Colab with an NVIDIA L4, at commit `f9c64dd`. The run folder is `runs/r1_vit_s42` on Drive.
+- Decisions D11 and D12 changed the training code before the run. A first run stopped after epoch 10. No test driver was scored with it.
+- The evaluation scored epoch 19 on the test drivers one time. `results/test_access_log.csv` holds the row of this unlock.
+- R1 has the accuracy 89.46 and the class-mean accuracy 89.16. Source: `results/replication/r1_vit_s42_test_metrics.json`.
+- Both scores are more than 1.00 point above 85.36. Thus the seeds 43 and 44 do not run.
+- G1 passes. Phase 2 starts after a yes of the owner. `results/replication/scores.md` holds the table of scores.
 
 ## 8. Phase 2: development
 
