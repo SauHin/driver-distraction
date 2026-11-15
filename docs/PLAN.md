@@ -37,6 +37,7 @@ The research questions are:
 | D7 | 2026-11-15 | AUC v2 is cancelled. The experiments use StateFarm only. | Choice of the owner. |
 | D8 | 2026-11-15 | The development folds come from split v2. Split v1 is void for development. | Choice of the owner among 3 options. The owner approved the file on the same day. Section 4 gives the reason. |
 | D9 | 2026-11-15 | The replication runs R1 only. R2 and the emotion experiment E6 are void. | Choice of the owner among 3 options. The face crops and emotion labels of ViT-DD do not download. |
+| D10 | 2026-11-15 | R1 uses the ViT-DD config with no face input and no emotion head. | Choice of the owner among 3 options. The paper gives no recipe for R1. See `results/vitdd_recipe_check.md`. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -193,6 +194,8 @@ Tasks of Claude:
 - C4. Write the manifest script and the Colab notebook.
 - C5. Download the public lists, config files, weights, and face crops of ViT-DD. Record what downloads.
 - C6. Measure the first run on Colab and on the laptop. Write `results/compute/first_run.json`.
+- C6 status on 2026-11-15: the laptop part is in `results/compute/first_run.json`. The Colab part is TBD.
+- On the laptop, the R1 config stops with CUDA out of memory at batch 128. R1 runs on Colab only.
 
 Phase 0 is complete after these points:
 
@@ -206,10 +209,11 @@ The recipe comes from the public config `vitdd_sfddd_sbd.yaml`:
 
 - Model: `deit3_base_patch16_224` from `timm`, with ImageNet weights.
 - Input: the driver image at 224 pixels. ViT-DD adds a face crop at 32 pixels.
-- Trainable parts: the attention layers, the heads, and the position embedding.
+- Trainable parts: each parameter with `.attn.` in its name, the head, and the position embedding.
 - Training: 20 epochs, batch size 128, AdamW, weight decay 0.1, learning rate 0.0003.
 - Schedule: 5 warm-up epochs from 0.000001, then a cosine curve to 0.
-- Other values: label smoothing 0.1, color jitter 0.3, the 3-Augment set, seed 42, 32-bit numbers.
+- Other values: no label smoothing, no Mixup, color jitter 0.3, the 3-Augment set, seed 42, 32-bit numbers.
+- Decision D10: R1 uses this recipe with no face input and no emotion head.
 - ViT-DD loss: weight 0.999 for the driver task and 0.001 for the emotion task.
 
 Steps:
@@ -223,7 +227,7 @@ Points to check before R1:
 
 - The `timm` name of the model gives different default weights in old and new versions. Use the weights of the 2022 code.
 - The paper text gives batch size 256. The public config gives 128. This plan uses the config.
-- Read the public data code and list each augmentation step. Find out whether the code flips images.
+- Read the public data code and list each augmentation step. Find out whether the code flips images. Done in `results/vitdd_recipe_check.md`.
 - Record each difference from the recipe in the run folder.
 
 Outputs in `results/replication/`:

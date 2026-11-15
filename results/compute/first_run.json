@@ -1,0 +1,31 @@
+{
+  "laptop_bs32": {
+    "run": "c6_laptop_bs32",
+    "config_name": "r1_vit",
+    "batch_size": 32,
+    "environment": {
+      "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+      "python": "3.10.9",
+      "torch": "2.6.0+cu124",
+      "torchvision": "0.21.0+cu124",
+      "timm": "1.0.31",
+      "cuda": "12.4",
+      "git_commit": "3b068423b739d6406a6674dde08ecc5021f8b138"
+    },
+    "epochs": [
+      {
+        "epoch": "0",
+        "lr": "1e-06",
+        "train_loss": "2.4026730060577393",
+        "train_images": "640",
+        "epoch_seconds": "48.55",
+        "images_per_second": "13.18",
+        "gpu_peak_memory_mb": "3250",
+        "val_accuracy": "",
+        "val_class_mean_accuracy": "",
+        "val_macro_f1": ""
+      }
+    ],
+    "note": "R1 config with batch 32 and 20 steps. The time includes the start of the data workers. Batch 128 stopped with CUDA out of memory on this GPU."
+  }
+}

@@ -77,12 +77,14 @@ Run the commands from the root of the repository. On Windows, use `.venv/Scripts
 
 ```
 python -m venv .venv
-python -m pip install -e ".[test]"
+python -m pip install -e ".[test,train]"
 python -m pytest -q
 python scripts/make_split.py
 python scripts/audit_statefarm.py
 python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv
 python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv --check
+python scripts/train.py configs/r1_vit.json
+python scripts/record_speed.py runs/RUN_NAME --key laptop
 ```
 
 - `make_split.py` reads the public ViT-DD lists in `data/external/vitdd/annotations/SFDDD/`.
@@ -91,4 +93,6 @@ python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv 
 - Use `--images` for another folder of class folders.
 - The manifest lists image names. It stays in `data/` and not in git.
 - `notebooks/colab_runner.ipynb` starts the scripts on Colab.
+- `train.py` continues a run from `last.pt` in its run folder.
+- The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
