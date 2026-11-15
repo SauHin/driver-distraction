@@ -403,6 +403,7 @@ Cut rules:
 - The first run measures the epoch time, the GPU use, the GPU memory, and the compute units per hour.
 - The number of parallel runs follows these measured numbers. They are TBD.
 - One Claude Code session drives one notebook. This limit comes from the brief.
+- The session drives the notebook through the Colab MCP server. `CLAUDE.md` gives the steps.
 - Long jobs run in the background and write logs to Drive. Each epoch saves a checkpoint.
 
 Planned layout of the repository:

@@ -96,3 +96,21 @@ python scripts/record_speed.py runs/RUN_NAME --key laptop
 - `train.py` continues a run from `last.pt` in its run folder.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
+
+## Colab
+
+The AI runs the Colab work through the Colab MCP server. Do not ask the owner to run notebook cells.
+
+1. Call `open_colab_browser_connection`. Then read the open notebook with `get_cells`.
+2. Run `!nvidia-smi` first. If the runtime has no GPU, ask the owner to change the runtime type to a GPU.
+3. Copy the cells of `notebooks/colab_runner.ipynb` into the open notebook, and run them in order.
+4. Start each job of more than a few minutes in the background with `nohup`. Write its log to Drive.
+5. Read the log later with a short cell.
+6. Copy each result file from Drive into `results/` in git. Copy the saved values only.
+
+- The owner does only the steps that the AI cannot do. These steps are to open a notebook, pick the GPU, allow the Drive mount, and read the compute units.
+- A fix in a Colab cell goes into `notebooks/colab_runner.ipynb` too. Keep the two the same.
+- If the Colab tools are missing, check the server status first.
+- If the server failed with a timeout, the owner runs its `uvx` command once in a terminal. Then the owner presses Reconnect in `/mcp`.
+- After the work, tell the owner to stop the runtime. An open GPU runtime uses compute units.
+- The Drive folder is `MyDrive/driver-distraction`, with `data/raw/statefarm/`, `manifests/`, `logs/`, `runs/`, and `results/`.
