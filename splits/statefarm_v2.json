@@ -1,0 +1,109 @@
+{
+  "name": "statefarm_v2",
+  "source": "https://github.com/PurdueDigitalTwin/ViT-DD, annotations/SFDDD/train_list_d_01.csv (dev) and val_list_d_01.csv (test)",
+  "method": "Each fold gets an equal share of the development drivers of each scene group. Of these assignments, it takes the one with the smallest range of validation image counts. Scene groups: results/data_audit/statefarm_split_check.json. Image counts: results/data_audit/statefarm.json.",
+  "test": [
+    "p002",
+    "p012",
+    "p026",
+    "p035",
+    "p041",
+    "p045",
+    "p050",
+    "p075"
+  ],
+  "dev": [
+    "p014",
+    "p015",
+    "p016",
+    "p021",
+    "p022",
+    "p024",
+    "p039",
+    "p042",
+    "p047",
+    "p049",
+    "p051",
+    "p052",
+    "p056",
+    "p061",
+    "p064",
+    "p066",
+    "p072",
+    "p081"
+  ],
+  "folds": [
+    {
+      "train": [
+        "p016",
+        "p021",
+        "p022",
+        "p024",
+        "p039",
+        "p042",
+        "p047",
+        "p052",
+        "p061",
+        "p064",
+        "p066",
+        "p072"
+      ],
+      "val": [
+        "p014",
+        "p015",
+        "p049",
+        "p051",
+        "p056",
+        "p081"
+      ]
+    },
+    {
+      "train": [
+        "p014",
+        "p015",
+        "p022",
+        "p024",
+        "p039",
+        "p049",
+        "p051",
+        "p056",
+        "p061",
+        "p066",
+        "p072",
+        "p081"
+      ],
+      "val": [
+        "p016",
+        "p021",
+        "p042",
+        "p047",
+        "p052",
+        "p064"
+      ]
+    },
+    {
+      "train": [
+        "p014",
+        "p015",
+        "p016",
+        "p021",
+        "p042",
+        "p047",
+        "p049",
+        "p051",
+        "p052",
+        "p056",
+        "p064",
+        "p081"
+      ],
+      "val": [
+        "p022",
+        "p024",
+        "p039",
+        "p061",
+        "p066",
+        "p072"
+      ]
+    }
+  ]
+}

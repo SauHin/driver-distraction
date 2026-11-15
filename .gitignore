@@ -1,0 +1,22 @@
+docs/starter/
+# The owner keeps the AI usage log out of the public repository.
+docs/AI_LOG.md
+
+# Raw data and run output stay out of git.
+data/
+runs/
+
+# Weight files.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.bin
+*.h5
+
+# Python.
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
