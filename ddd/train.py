@@ -21,8 +21,10 @@ from ddd.models import create
 from ddd.splits import _git_commit, load_split
 from ddd.statefarm import load_rows
 
-HISTORY_FIELDS = ["epoch", "lr", "train_loss", "train_images", "epoch_seconds", "images_per_second",
-                  "gpu_peak_memory_mb", "val_accuracy", "val_class_mean_accuracy", "val_macro_f1"]
+# train_accuracy is the share of correct augmented images during the epoch.
+HISTORY_FIELDS = ["epoch", "lr", "train_loss", "train_accuracy", "train_images", "epoch_seconds",
+                  "images_per_second", "gpu_peak_memory_mb", "val_loss", "val_accuracy",
+                  "val_class_mean_accuracy", "val_macro_f1"]
 
 
 def environment():
@@ -60,14 +62,20 @@ def optimizer(model, cfg):
     return create_optimizer_v2(params, opt="adamw", lr=cfg["lr"], weight_decay=cfg["weight_decay"])
 
 
-def evaluate(model, loader, device):
+def evaluate(model, loader, device, loss_fn=None):
+    """The confusion matrix, and the mean loss with `loss_fn` (None with no `loss_fn`)."""
     model.eval()
-    targets, preds = [], []
+    targets, preds, loss_sum = [], [], 0.0
     with torch.no_grad():
         for x, y in loader:
-            preds.append(model(x.to(device, non_blocking=True)).argmax(1).cpu())
+            out = model(x.to(device, non_blocking=True))
+            if loss_fn is not None:
+                loss_sum += loss_fn(out, y.to(device)).item() * len(y)
+            preds.append(out.argmax(1).cpu())
             targets.append(y)
-    return confusion(torch.cat(targets).numpy(), torch.cat(preds).numpy())
+    t = torch.cat(targets)
+    loss = loss_sum / len(t) if loss_fn is not None else None
+    return confusion(t.numpy(), torch.cat(preds).numpy()), loss
 
 
 def run(cfg, run_dir, max_steps=None):
@@ -133,28 +141,30 @@ def run(cfg, run_dir, max_steps=None):
         model.train()
         if device.type == "cuda":
             torch.cuda.reset_peak_memory_stats()
-        t0, loss_sum, n = time.time(), 0.0, 0
+        t0, loss_sum, correct, n = time.time(), 0.0, 0, 0
         for step, (x, y) in enumerate(train_dl):
             if max_steps is not None and step >= max_steps:
                 break
             x, y = x.to(device, non_blocking=True), y.to(device, non_blocking=True)
-            loss = loss_fn(model(x), y)
+            out = model(x)
+            loss = loss_fn(out, y)
             opt.zero_grad(set_to_none=True)
             loss.backward()
             opt.step()
             loss_sum += loss.item() * len(y)
+            correct += (out.argmax(1) == y).sum().item()
             n += len(y)
         if device.type == "cuda":
             torch.cuda.synchronize()
         seconds = time.time() - t0
         row = {"epoch": epoch, "lr": opt.param_groups[0]["lr"], "train_loss": loss_sum / max(n, 1),
-               "train_images": n, "epoch_seconds": round(seconds, 2),
+               "train_accuracy": correct / max(n, 1), "train_images": n, "epoch_seconds": round(seconds, 2),
                "images_per_second": round(n / seconds, 2) if seconds else 0,
                "gpu_peak_memory_mb": round(torch.cuda.max_memory_allocated() / 2**20)
                if device.type == "cuda" else 0}
         if val_dl is not None:
-            m = scores(evaluate(model, val_dl, device))
-            row.update({f"val_{k}": v for k, v in m.items()})
+            m, row["val_loss"] = evaluate(model, val_dl, device, loss_fn)
+            row.update({f"val_{k}": v for k, v in scores(m).items()})
         with open(history, "a", newline="", encoding="utf-8") as f:
             csv.DictWriter(f, HISTORY_FIELDS).writerow(row)
         tmp = run_dir / "last.pt.tmp"
@@ -165,3 +175,16 @@ def run(cfg, run_dir, max_steps=None):
         if epoch == cfg["epochs"] - 1:
             (run_dir / "metrics.json").write_text(json.dumps(row, indent=2) + "\n", encoding="utf-8")
     return run_dir
+
+
+def pending_runs(queue_path, runs_dir):
+    """(config path, fold, run name) of each queue line with no `metrics.json` in its run folder.
+    A line holds a config path and a fold. Text after # is a comment."""
+    out = []
+    for line in Path(queue_path).read_text(encoding="utf-8").splitlines():
+        parts = line.split("#")[0].split()
+        if parts:
+            name = f"{Path(parts[0]).stem}_f{parts[1]}"
+            if not (Path(runs_dir) / name / "metrics.json").exists():
+                out.append((parts[0], int(parts[1]), name))
+    return out

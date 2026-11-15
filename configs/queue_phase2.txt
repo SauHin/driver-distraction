@@ -1,0 +1,19 @@
+# Phase 2 queue: one config and one fold on each line. scripts/run_queue.py reads it.
+configs/b0.json 0
+configs/b0.json 1
+configs/b0.json 2
+configs/e1_mobilenetv3_large.json 0
+configs/e1_mobilenetv3_large.json 1
+configs/e1_mobilenetv3_large.json 2
+configs/e1_efficientnet_b0.json 0
+configs/e1_efficientnet_b0.json 1
+configs/e1_efficientnet_b0.json 2
+configs/e1_resnet50.json 0
+configs/e1_resnet50.json 1
+configs/e1_resnet50.json 2
+configs/e1_deit3_small.json 0
+configs/e1_deit3_small.json 1
+configs/e1_deit3_small.json 2
+configs/e1_deit3_base.json 0
+configs/e1_deit3_base.json 1
+configs/e1_deit3_base.json 2

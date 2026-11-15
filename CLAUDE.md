@@ -14,9 +14,10 @@ The deliverables are a working application and a technical report.
 
 The folder `docs/starter/` and the file `docs/AI_LOG.md` are not in git.
 
-## State on 2026-11-14
+## State on 2026-11-15
 
-- The code of Phase 0 (tasks C1 to C5) exists. No training run exists. No result exists.
+- Phase 0 is complete. R1 passed gate G1. See `results/replication/scores.md`.
+- Phase 2 started after a yes of the owner. The runs use the Colab L4, one run at a time (decision D13).
 - The public ViT-DD weights, face crops, and emotion labels do not download. See `results/vitdd_public_files.md`.
 - The owner selected StateFarm as the only dataset. AUC v2 is cancelled (decision D7).
 - The replication target is R1, the standard ViT of the ViT-DD paper, with the public split by driver (decision D9).
@@ -84,6 +85,8 @@ python scripts/audit_statefarm.py
 python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv
 python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv --check
 python scripts/train.py configs/r1_vit.json
+python scripts/train.py configs/b0.json --fold 0
+python scripts/run_queue.py configs/queue_phase2.txt --runs runs --logs logs
 python scripts/record_speed.py runs/RUN_NAME --key laptop
 ```
 
@@ -94,6 +97,8 @@ python scripts/record_speed.py runs/RUN_NAME --key laptop
 - The manifest lists image names. It stays in `data/` and not in git.
 - `notebooks/colab_runner.ipynb` starts the scripts on Colab.
 - `train.py` continues a run from `last.pt` in its run folder.
+- The option `--fold` of `train.py` replaces the fold of the config. The run folder holds the config with the fold.
+- `run_queue.py` trains the runs of a queue file one at a time. It skips each run with a `metrics.json`.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
 

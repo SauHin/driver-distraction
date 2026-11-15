@@ -10,8 +10,8 @@ timm = pytest.importorskip("timm")
 
 from ddd.evaluate import evaluate_run  # noqa: E402
 from ddd.metrics import binary_scores, confusion, scores  # noqa: E402
-from ddd.models import load_weights, set_trainable  # noqa: E402
-from ddd.train import optimizer, run  # noqa: E402
+from ddd.models import create, load_weights, set_trainable  # noqa: E402
+from ddd.train import optimizer, pending_runs, run  # noqa: E402
 
 
 def test_scores_from_confusion():
@@ -44,6 +44,19 @@ def test_wd_skip_list_decays_pos_embed():
         groups = optimizer(m, {**cfg, **extra}).param_groups
         assert [g["weight_decay"] for g in groups if any(p is m.pos_embed for p in g["params"])] == [want]
         assert [g["weight_decay"] for g in groups if any(p is m.head.bias for p in g["params"])] == [0.0]
+
+
+def test_create_cnn_takes_no_img_size():
+    m = create({"model": "resnet18", "weights": None, "input_size": 32})
+    assert m(torch.zeros(2, 3, 32, 32)).shape == (2, 10)
+
+
+def test_pending_runs_skips_complete_runs(tmp_path):
+    q = tmp_path / "queue.txt"
+    q.write_text("# config fold\nconfigs/b0.json 0\n\nconfigs/b0.json 1  # second\n", encoding="utf-8")
+    (tmp_path / "runs" / "b0_f0").mkdir(parents=True)
+    (tmp_path / "runs" / "b0_f0" / "metrics.json").write_text("{}", encoding="utf-8")
+    assert pending_runs(q, tmp_path / "runs") == [("configs/b0.json", 1, "b0_f1")]
 
 
 def test_load_weights_renames_layer_scales(tmp_path):
@@ -94,6 +107,9 @@ def test_run_writes_folder_and_continues(tmp_path):
     for name in ("config.json", "environment.json", "history.csv", "metrics.json", "last.pt"):
         assert (run_dir / name).exists()
     assert _epochs(run_dir) == [0, 1]
+    with open(run_dir / "history.csv", newline="", encoding="utf-8") as f:
+        last = list(csv.DictReader(f))[-1]
+    assert 0 <= float(last["train_accuracy"]) <= 1 and float(last["val_loss"]) > 0
     # A disconnect after the checkpoint of epoch 0 and the history row of epoch 1.
     ck = torch.load(run_dir / "last.pt", weights_only=False)
     ck["epoch"] = 0

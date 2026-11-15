@@ -40,6 +40,7 @@ The research questions are:
 | D10 | 2026-11-15 | R1 uses the ViT-DD config with no face input and no emotion head. | Choice of the owner among 3 options. The paper gives no recipe for R1. See `results/vitdd_recipe_check.md`. |
 | D11 | 2026-11-15 | R1 steps the scheduler after each epoch, as ViT-DD does with Lightning 1.7.7. Config key `sched_after_epoch`. | Choice of the owner. The first code stepped it at the start of each epoch. See `results/vitdd_recipe_check.md`. |
 | D12 | 2026-11-15 | R1 gives the position embedding the weight decay 0.1, as `ViTDDLM` does. Config key `wd_skip_list`. | Choice of the owner. The first R1 run gave it no weight decay. The owner stopped that run after epoch 10. |
+| D13 | 2026-11-15 | The training runs of Phase 2 use the Colab L4, one run at a time. | Choice of the owner among 3 options. All runs have the same GPU and batch size, so their training times compare. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -60,6 +61,9 @@ The owner can change each of these decisions.
 | P9 | The gate reads the last epoch of the run with seed 42. | The public config uses seed 42. No selection on test drivers occurs. |
 | P10 | The manifests and the public ViT-DD image lists stay in `data/`, not in git. | They hold the image names of the dataset. |
 | P11 | The split file holds the 3 folds with the train and the validation drivers of each fold. | A reader sees each part with no code. A test keeps the lists equal to the output of the split method. |
+| P12 | A development run gives the scores of its last epoch on its validation fold. | Phase 3 has no validation part to select an epoch. Decision P9 reads the last epoch too. |
+| P13 | Values that section 8.2 does not name come from the R1 config. | Each experiment then changes one variable from B0. |
+| P14 | The E1 models start from the default ImageNet-1k weights of `timm` 1.0.31. DeiT-III Base starts from the weight file of R1. | B0 and the DeiT-III Base of E1 then have the same start weights. |
 
 ## 3. Data
 
@@ -297,10 +301,13 @@ Shared recipe of the development runs:
 - AdamW, 5 warm-up epochs, a cosine curve, 20 epochs, label smoothing 0.1, seed 42.
 - Learning rate 0.0003 for the ViT models and 0.001 for the CNN models.
 - The augmentation set that wins E3. Before E3, the paper set.
+- Decision P13: batch size 128, weight decay 0.1, a warm-up from 0.000001, the scheduler step of D11, no drop path, 32-bit numbers.
+- The configs are `configs/b0.json` and `configs/e1_*.json`. The queue file `configs/queue_phase2.txt` gives the order of the runs.
 
 ### 8.3 Training analysis
 
 Each run writes these values for each epoch: training loss, validation loss, training accuracy, validation accuracy, and validation macro F1.
+The training accuracy counts the augmented images during the epoch. The validation loss uses the loss of the training, with its label smoothing.
 
 The analysis covers these points of the guideline:
 
@@ -409,11 +416,10 @@ Cut rules:
 
 ## 13. Compute
 
-- The laptop has an NVIDIA RTX 3050 with 6 GB. It runs the tests, the data work, small models, the speed tests, and the application.
-- Colab Pro runs the DeiT and ResNet models.
-- Small models run as some processes on one GPU at the same time. Check the GPU memory with `nvidia-smi` first.
+- The laptop has an NVIDIA RTX 3050 with 6 GB. It runs the tests, the data work, the speed tests, and the application.
+- Decision D13: Colab Pro runs all training runs of Phase 2 on an L4, one run at a time.
+- `scripts/run_queue.py` starts the runs of a queue file in order. It skips each run with a `metrics.json`.
 - The first run measures the epoch time, the GPU use, the GPU memory, and the compute units per hour.
-- The number of parallel runs follows these measured numbers. They are TBD.
 - One Claude Code session drives one notebook. This limit comes from the brief.
 - The session drives the notebook through the Colab MCP server. `CLAUDE.md` gives the steps.
 - Long jobs run in the background and write logs to Drive. Each epoch saves a checkpoint.

@@ -44,7 +44,7 @@ def evaluate_run(run_dir, reason, out_dir=OUT_DIR, log_path=TEST_ACCESS_LOG):
         ds = StateFarmImages([r for r in rows if r["subject"] == d], cfg["data_root"], tf)
         dl = DataLoader(ds, batch_size=cfg["batch_size"], num_workers=cfg["num_workers"],
                         pin_memory=True)
-        per_driver[d] = evaluate(model, dl, device)
+        per_driver[d], _ = evaluate(model, dl, device)
     total = np.sum(list(per_driver.values()), axis=0)
 
     out_dir.mkdir(parents=True, exist_ok=True)

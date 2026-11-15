@@ -30,11 +30,14 @@ def set_trainable(model, trainable):
 
 
 def create(cfg):
-    model = timm.create_model(cfg["model"], pretrained=False, num_classes=10,
+    """`weights` is a local file, "timm" for the ImageNet weights of the timm name, or None."""
+    name, weights = cfg["model"], cfg.get("weights")
+    # The CNN classes of timm take no `img_size`.
+    size = {"img_size": cfg.get("input_size", 224)} if name.startswith(("vit_", "deit")) else {}
+    model = timm.create_model(name, pretrained=weights == "timm", num_classes=10,
                               drop_rate=cfg.get("drop", 0.0),
-                              drop_path_rate=cfg.get("drop_path", 0.0),
-                              img_size=cfg.get("input_size", 224))
-    if cfg.get("weights"):
-        load_weights(model, cfg["weights"])
+                              drop_path_rate=cfg.get("drop_path", 0.0), **size)
+    if weights not in (None, "timm"):
+        load_weights(model, weights)
     set_trainable(model, cfg.get("trainable", "all"))
     return model
