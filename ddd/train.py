@@ -11,7 +11,7 @@ import numpy as np
 import timm
 import torch
 import torchvision
-from timm.optim import create_optimizer_v2
+from timm.optim import create_optimizer_v2, param_groups_weight_decay
 from timm.scheduler import CosineLRScheduler
 from torch.utils.data import DataLoader
 
@@ -47,6 +47,17 @@ def _parts(cfg):
         return load_rows(csv_path, split, "dev"), []
     return (load_rows(csv_path, split, "train", cfg["fold"]),
             load_rows(csv_path, split, "val", cfg["fold"]))
+
+
+def optimizer(model, cfg):
+    """AdamW of timm. Biases, 1-D weights, and the `no_weight_decay` list of the model get no
+    weight decay. `wd_skip_list` replaces that list. ViT-DD gives timm a wrapper module with
+    no such list, so its `pos_embed` decays: `"wd_skip_list": []`."""
+    params = model
+    if "wd_skip_list" in cfg:
+        params = param_groups_weight_decay(model, cfg["weight_decay"],
+                                           no_weight_decay_list=cfg["wd_skip_list"])
+    return create_optimizer_v2(params, opt="adamw", lr=cfg["lr"], weight_decay=cfg["weight_decay"])
 
 
 def evaluate(model, loader, device):
@@ -90,7 +101,7 @@ def run(cfg, run_dir, max_steps=None):
                             batch_size=cfg["batch_size"], num_workers=cfg["num_workers"],
                             pin_memory=True)
     model = create(cfg).to(device)
-    opt = create_optimizer_v2(model, opt="adamw", lr=cfg["lr"], weight_decay=cfg["weight_decay"])
+    opt = optimizer(model, cfg)
     sched = CosineLRScheduler(opt, t_initial=cfg["epochs"], lr_min=cfg["min_lr"],
                               warmup_t=cfg["warmup_epochs"], warmup_lr_init=cfg["warmup_lr"])
     loss_fn = torch.nn.CrossEntropyLoss(label_smoothing=cfg.get("label_smoothing", 0.0))

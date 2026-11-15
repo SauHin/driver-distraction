@@ -11,7 +11,7 @@ timm = pytest.importorskip("timm")
 from ddd.evaluate import evaluate_run  # noqa: E402
 from ddd.metrics import binary_scores, confusion, scores  # noqa: E402
 from ddd.models import load_weights, set_trainable  # noqa: E402
-from ddd.train import run  # noqa: E402
+from ddd.train import optimizer, run  # noqa: E402
 
 
 def test_scores_from_confusion():
@@ -34,6 +34,16 @@ def test_trainable_parts_follow_vitdd():
     assert "pos_embed" in on and "head.weight" in on and "blocks.0.attn.qkv.weight" in on
     assert not any(n.startswith("patch_embed") or ".mlp." in n or "norm" in n for n in on)
     assert "cls_token" not in on
+
+
+def test_wd_skip_list_decays_pos_embed():
+    m = timm.create_model("vit_tiny_patch16_224", pretrained=False, num_classes=10, img_size=32)
+    set_trainable(m, "attn_head_pos")
+    cfg = {"lr": 0.001, "weight_decay": 0.1}
+    for extra, want in (({}, 0.0), ({"wd_skip_list": []}, 0.1)):
+        groups = optimizer(m, {**cfg, **extra}).param_groups
+        assert [g["weight_decay"] for g in groups if any(p is m.pos_embed for p in g["params"])] == [want]
+        assert [g["weight_decay"] for g in groups if any(p is m.head.bias for p in g["params"])] == [0.0]
 
 
 def test_load_weights_renames_layer_scales(tmp_path):

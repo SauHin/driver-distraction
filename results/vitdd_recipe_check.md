@@ -38,6 +38,10 @@ The config sets `src: true`, `three_augment: true`, and `color_jitter: 0.3`. The
 - Epoch 0 trains with the start value of the scheduler, 0.000001. Source: `loops/epoch/training_epoch_loop.py` and `loops/fit_loop.py` of Lightning 1.7.7.
 - The scheduler of `timm` 0.6.12 gets `t_initial` equal to the epochs and no `warmup_prefix`. The config of this project uses the same values.
 - The training loader of the code drops the last part batch (`drop_last=True`). The loader of this project does the same.
+- Weight decay: both classes give `create_optimizer_v2` of `timm` the module `self.model`. Biases and 1-D weights get no weight decay.
+- In `ViTDDLM`, `self.model` is the class `ViTDD` of `models/vitdd.py`. This class has no `no_weight_decay` list, so the position embeddings get the weight decay 0.1.
+- In `VisionTransformerLM`, `self.model` is the ViT of `timm`. In `timm` 1.0.31, the list `no_weight_decay` of the ViT holds `pos_embed`.
+- The Lightning config of the public code sets 32-bit numbers, no gradient clipping, and no gradient accumulation.
 - Drop path: 0.
 - Batch size: 128 in the config. The paper text gives 256.
 - Validation: the config reads the test list `val_list_d_01.csv` as the validation list. The code scores the test drivers after each epoch.
@@ -65,3 +69,6 @@ The config sets `src: true`, `three_augment: true`, and `color_jitter: 0.3`. The
 - The plan names the attention layers, the heads, and the position embedding as trained parts. The single-task class also trains the patch embedding.
 - The code flips the images. Four classes depend on the left or right hand, so experiment E3 stays in the plan.
 - The first training code of this project stepped the scheduler at the start of each epoch. On 2026-11-15, the owner selected the step order of ViT-DD for R1. The config key is `sched_after_epoch`.
+- The first R1 run gave `pos_embed` no weight decay, by the `no_weight_decay` list of `timm`. The owner stopped this run after epoch 10.
+- The owner then selected the weight decay of `ViTDDLM` for R1. The config key `wd_skip_list` is an empty list.
+- The stopped run is in the Drive folder `runs/void_r1_vit_s42_pos_embed_wd0`. No test driver was scored with it.
