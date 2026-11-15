@@ -34,6 +34,10 @@ The config sets `src: true`, `three_augment: true`, and `color_jitter: 0.3`. The
 - Loss: `CrossEntropyLoss` with no label smoothing. The config gives `smoothing: 0.1`, but `ViTDDLM` does not use it.
 - Mixup and CutMix: not in `ViTDDLM`.
 - Schedule: the cosine scheduler of `timm`, with one step for each epoch. The warm-up starts at 0.000001 for 5 epochs. The end value is 0.
+- Step order: Lightning 1.7.7 calls `scheduler.step(epoch=k)` at the end of training epoch k. Thus epoch k trains with the value of step k - 1.
+- Epoch 0 trains with the start value of the scheduler, 0.000001. Source: `loops/epoch/training_epoch_loop.py` and `loops/fit_loop.py` of Lightning 1.7.7.
+- The scheduler of `timm` 0.6.12 gets `t_initial` equal to the epochs and no `warmup_prefix`. The config of this project uses the same values.
+- The training loader of the code drops the last part batch (`drop_last=True`). The loader of this project does the same.
 - Drop path: 0.
 - Batch size: 128 in the config. The paper text gives 256.
 - Validation: the config reads the test list `val_list_d_01.csv` as the validation list. The code scores the test drivers after each epoch.
@@ -60,3 +64,4 @@ The config sets `src: true`, `three_augment: true`, and `color_jitter: 0.3`. The
 - The plan names label smoothing 0.1. The code of ViT-DD does not apply it.
 - The plan names the attention layers, the heads, and the position embedding as trained parts. The single-task class also trains the patch embedding.
 - The code flips the images. Four classes depend on the left or right hand, so experiment E3 stays in the plan.
+- The first training code of this project stepped the scheduler at the start of each epoch. On 2026-11-15, the owner selected the step order of ViT-DD for R1. The config key is `sched_after_epoch`.

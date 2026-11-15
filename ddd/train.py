@@ -114,7 +114,11 @@ def run(cfg, run_dir, max_steps=None):
         w.writerows(kept)
 
     for epoch in range(start, cfg["epochs"]):
-        sched.step(epoch)
+        # ViT-DD (Lightning 1.7) steps the scheduler after each epoch: epoch k trains with the
+        # value of k - 1, and epoch 0 with the start value of the scheduler.
+        t = epoch - 1 if cfg.get("sched_after_epoch") else epoch
+        if t >= 0:
+            sched.step(t)
         model.train()
         if device.type == "cuda":
             torch.cuda.reset_peak_memory_stats()

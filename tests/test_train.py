@@ -8,7 +8,8 @@ from PIL import Image
 torch = pytest.importorskip("torch")
 timm = pytest.importorskip("timm")
 
-from ddd.metrics import confusion, scores  # noqa: E402
+from ddd.evaluate import evaluate_run  # noqa: E402
+from ddd.metrics import binary_scores, confusion, scores  # noqa: E402
 from ddd.models import load_weights, set_trainable  # noqa: E402
 from ddd.train import run  # noqa: E402
 
@@ -19,6 +20,11 @@ def test_scores_from_confusion():
     assert s["accuracy"] == pytest.approx(3 / 5)
     assert s["class_mean_accuracy"] == pytest.approx((1 / 2 + 1 + 0) / 3)
     assert s["macro_f1"] == pytest.approx((2 / 4 + 4 / 5 + 0) / 3)
+    # Distracted: 2 found of 3, and 1 safe image called distracted.
+    b = binary_scores(m)
+    assert b["distracted_precision"] == pytest.approx(2 / 3)
+    assert b["distracted_recall"] == pytest.approx(2 / 3)
+    assert b["distracted_f1"] == pytest.approx(2 / 3)
 
 
 def test_trainable_parts_follow_vitdd():
@@ -86,3 +92,35 @@ def test_run_writes_folder_and_continues(tmp_path):
     assert _epochs(run_dir) == [0, 1]
     with pytest.raises(ValueError):
         run({**cfg, "lr": 0.5}, run_dir)
+
+
+def test_evaluate_scores_last_epoch_only(tmp_path):
+    cfg = _tiny_data(tmp_path / "sf")
+    split = {"name": "tiny", "dev": ["p001"], "test": ["p002"], "folds": []}
+    (tmp_path / "sf" / "split.json").write_text(json.dumps(split), encoding="utf-8")
+    run_dir = run({**cfg, "fold": None}, tmp_path / "runs" / "tiny")
+    log, out = tmp_path / "log.csv", tmp_path / "out"
+    m = evaluate_run(run_dir, "unit test", out, log)
+    assert m["epoch"] == 1 and m["test_drivers"] == ["p002"] and m["images"] == 4
+    assert "distracted_f1" in m and "macro_f1" in m
+    with open(out / "tiny_test_confusion.csv", newline="", encoding="utf-8") as f:
+        assert sum(int(v) for r in list(csv.reader(f))[1:] for v in r[1:]) == 4
+    with open(out / "tiny_test_drivers.csv", newline="", encoding="utf-8") as f:
+        assert [r["driver"] for r in csv.DictReader(f)] == ["p002"]
+    # A checkpoint of an earlier epoch is refused before the unlock.
+    ck = torch.load(run_dir / "last.pt", weights_only=False)
+    ck["epoch"] = 0
+    torch.save(ck, run_dir / "last.pt")
+    with pytest.raises(ValueError):
+        evaluate_run(run_dir, "unit test", out, log)
+    with open(log, newline="", encoding="utf-8") as f:
+        assert len(list(csv.DictReader(f))) == 1
+
+
+def test_sched_after_epoch_follows_lightning(tmp_path):
+    cfg = _tiny_data(tmp_path / "sf")
+    run_dir = run({**cfg, "sched_after_epoch": True}, tmp_path / "runs" / "tiny")
+    with open(run_dir / "history.csv", newline="", encoding="utf-8") as f:
+        lrs = [float(r["lr"]) for r in csv.DictReader(f)]
+    # Epoch 0 has the start value, and epoch 1 has the value of step 0. Both are the warm-up start.
+    assert lrs == pytest.approx([cfg["warmup_lr"]] * 2)
