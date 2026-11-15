@@ -198,7 +198,8 @@ Tasks of Claude:
 - C6. Measure the first run on Colab and on the laptop. Write `results/compute/first_run.json`.
 - C6 status on 2026-11-15: the laptop part and the Colab part are in `results/compute/first_run.json`.
 - The Colab part is one full epoch of R1 at batch 128 on an NVIDIA L4. The GPU log is `results/compute/c6_colab_gpu.csv`.
-- The compute units per hour of Colab are TBD. Only the Colab page shows them.
+- On 2026-11-15, the Colab page gave about 1.94 compute units per hour for the L4 runtime.
+- Source: the key `colab_compute_units` of `results/compute/first_run.json`. The owner read the page.
 - On the laptop, the R1 config stops with CUDA out of memory at batch 128. R1 runs on Colab only.
 
 Phase 0 is complete after these points:

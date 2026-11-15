@@ -56,5 +56,13 @@
       }
     ],
     "note": "R1 config, one full epoch. GPU use: /content/drive/MyDrive/driver-distraction/logs/c6_gpu.csv."
+  },
+  "colab_compute_units": {
+    "date": "2026-11-15",
+    "source": "Resource page of Colab Pro, read by the owner and pasted in the chat.",
+    "gpu": "NVIDIA L4",
+    "units_per_hour": 1.94,
+    "units_available": 357.21,
+    "note": "The page gives 'about 1.94 per hour' with 1 open session. That session is the L4 runtime of R1, after the run ended."
   }
 }
