@@ -87,6 +87,8 @@ python scripts/make_manifest.py data/raw/statefarm data/manifests/statefarm.csv 
 python scripts/train.py configs/r1_vit.json
 python scripts/train.py configs/b0.json --fold 0
 python scripts/run_queue.py configs/queue_phase2.txt --runs runs --logs logs
+python scripts/summarize_folds.py "G:/My Drive/driver-distraction/runs" b0
+python scripts/score_gray.py "G:/My Drive/driver-distraction/runs" b0
 python scripts/record_speed.py runs/RUN_NAME --key laptop
 ```
 
@@ -99,6 +101,8 @@ python scripts/record_speed.py runs/RUN_NAME --key laptop
 - `train.py` continues a run from `last.pt` in its run folder.
 - The option `--fold` of `train.py` replaces the fold of the config. The run folder holds the config with the fold.
 - `run_queue.py` trains the runs of a queue file one at a time. It skips each run with a `metrics.json`.
+- `summarize_folds.py` copies the files of the 3 fold runs to `results/development/` and writes their mean scores.
+- `score_gray.py` scores the 3 fold runs on their validation drivers in color and in gray scale.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
 
@@ -111,7 +115,8 @@ The AI runs the Colab work through the Colab MCP server. Do not ask the owner to
 3. Copy the cells of `notebooks/colab_runner.ipynb` into the open notebook, and run them in order.
 4. Start each job of more than a few minutes in the background with `nohup`. Write its log to Drive.
 5. Read the log later with a short cell.
-6. Copy each result file from Drive into `results/` in git. Copy the saved values only.
+6. While a job runs, run a short check cell at least every 30 minutes (decision D14). Colab can stop an idle runtime.
+7. Copy each result file from Drive into `results/` in git. Copy the saved values only.
 
 - The owner does only the steps that the AI cannot do. These steps are to open a notebook, pick the GPU, allow the Drive mount, and read the compute units.
 - A fix in a Colab cell goes into `notebooks/colab_runner.ipynb` too. Keep the two the same.

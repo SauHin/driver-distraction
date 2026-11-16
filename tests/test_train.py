@@ -8,6 +8,10 @@ from PIL import Image
 torch = pytest.importorskip("torch")
 timm = pytest.importorskip("timm")
 
+from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD  # noqa: E402
+
+from ddd.data import eval_transform  # noqa: E402
+from ddd.development import gray_scores  # noqa: E402
 from ddd.evaluate import evaluate_run  # noqa: E402
 from ddd.metrics import binary_scores, confusion, scores  # noqa: E402
 from ddd.models import create, load_weights, set_trainable  # noqa: E402
@@ -141,6 +145,19 @@ def test_evaluate_scores_last_epoch_only(tmp_path):
         evaluate_run(run_dir, "unit test", out, log)
     with open(log, newline="", encoding="utf-8") as f:
         assert len(list(csv.DictReader(f))) == 1
+
+
+def test_gray_scores_repeat_the_color_scores_of_the_run(tmp_path):
+    cfg = _tiny_data(tmp_path / "sf")
+    run(cfg, tmp_path / "runs" / "tiny_f0")
+    f = gray_scores(tmp_path / "runs", "tiny", n_folds=1, out_dir=tmp_path / "out")["folds"][0]
+    assert f["images"] == 4 and 0 <= f["gray"]["val_accuracy"] <= 1
+    assert f["color"]["val_accuracy"] == pytest.approx(f["file"]["val_accuracy"])
+    assert f["color"]["val_loss"] == pytest.approx(f["file"]["val_loss"])
+    # The gray step gives 3 equal channels before the normalization.
+    x = eval_transform(32, gray=True)(Image.new("RGB", (40, 32), (200, 50, 10)))
+    raw = x * torch.tensor(IMAGENET_DEFAULT_STD)[:, None, None] + torch.tensor(IMAGENET_DEFAULT_MEAN)[:, None, None]
+    assert torch.allclose(raw[0], raw[1], atol=1e-5) and torch.allclose(raw[1], raw[2], atol=1e-5)
 
 
 def test_sched_after_epoch_follows_lightning(tmp_path):

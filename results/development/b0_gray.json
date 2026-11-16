@@ -1,0 +1,103 @@
+{
+  "config": "b0",
+  "folds": [
+    {
+      "run": "b0_f0",
+      "fold": 0,
+      "images": 5299,
+      "file": {
+        "val_loss": 0.540841426524418,
+        "val_accuracy": 0.8654463106246462,
+        "val_class_mean_accuracy": 0.868339512052487,
+        "val_macro_f1": 0.8656779725976012
+      },
+      "color": {
+        "val_loss": 0.5408414054000625,
+        "val_accuracy": 0.8654463106246462,
+        "val_class_mean_accuracy": 0.868339512052487,
+        "val_macro_f1": 0.8656779725976012
+      },
+      "gray": {
+        "val_loss": 0.8125660935909963,
+        "val_accuracy": 0.8048688431779581,
+        "val_class_mean_accuracy": 0.8120818265577538,
+        "val_macro_f1": 0.8105277490832101
+      }
+    },
+    {
+      "run": "b0_f1",
+      "fold": 1,
+      "images": 5301,
+      "file": {
+        "val_loss": 0.5592443854018337,
+        "val_accuracy": 0.8970005659309565,
+        "val_class_mean_accuracy": 0.8962476900324955,
+        "val_macro_f1": 0.8966342164586407
+      },
+      "color": {
+        "val_loss": 0.5592444404800945,
+        "val_accuracy": 0.8970005659309565,
+        "val_class_mean_accuracy": 0.8962476900324955,
+        "val_macro_f1": 0.8966342164586407
+      },
+      "gray": {
+        "val_loss": 0.6686587755115402,
+        "val_accuracy": 0.8832295793246557,
+        "val_class_mean_accuracy": 0.8820888886993448,
+        "val_macro_f1": 0.8806045069329681
+      }
+    },
+    {
+      "run": "b0_f2",
+      "fold": 2,
+      "images": 5299,
+      "file": {
+        "val_loss": 0.5126750093985297,
+        "val_accuracy": 0.886959803736554,
+        "val_class_mean_accuracy": 0.886577407766269,
+        "val_macro_f1": 0.882576577756147
+      },
+      "color": {
+        "val_loss": 0.51267496529059,
+        "val_accuracy": 0.886959803736554,
+        "val_class_mean_accuracy": 0.886577407766269,
+        "val_macro_f1": 0.882576577756147
+      },
+      "gray": {
+        "val_loss": 0.6685132360151577,
+        "val_accuracy": 0.8535572749575392,
+        "val_class_mean_accuracy": 0.8526768552829814,
+        "val_macro_f1": 0.8462469822695013
+      }
+    }
+  ],
+  "mean": {
+    "file": {
+      "val_loss": 0.5375869404415938,
+      "val_accuracy": 0.8831355600973856,
+      "val_class_mean_accuracy": 0.883721536617084,
+      "val_macro_f1": 0.8816295889374629
+    },
+    "color": {
+      "val_loss": 0.5375869370569156,
+      "val_accuracy": 0.8831355600973856,
+      "val_class_mean_accuracy": 0.883721536617084,
+      "val_macro_f1": 0.8816295889374629
+    },
+    "gray": {
+      "val_loss": 0.7165793683725648,
+      "val_accuracy": 0.8472185658200511,
+      "val_class_mean_accuracy": 0.8489491901800267,
+      "val_macro_f1": 0.8457930794285599
+    }
+  },
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "python": "3.10.9",
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "timm": "1.0.31",
+    "cuda": "12.4",
+    "git_commit": "6767bcc4a9995039917cfc0875f287ebe3cd8d74"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "config": "b0",
+  "folds": [
+    {
+      "run": "b0_f0",
+      "fold": 0,
+      "val_loss": 0.540841426524418,
+      "val_accuracy": 0.8654463106246462,
+      "val_class_mean_accuracy": 0.868339512052487,
+      "val_macro_f1": 0.8656779725976012,
+      "sum_epoch_seconds": 2494.26
+    },
+    {
+      "run": "b0_f1",
+      "fold": 1,
+      "val_loss": 0.5592443854018337,
+      "val_accuracy": 0.8970005659309565,
+      "val_class_mean_accuracy": 0.8962476900324955,
+      "val_macro_f1": 0.8966342164586407,
+      "sum_epoch_seconds": 2471.78
+    },
+    {
+      "run": "b0_f2",
+      "fold": 2,
+      "val_loss": 0.5126750093985297,
+      "val_accuracy": 0.886959803736554,
+      "val_class_mean_accuracy": 0.886577407766269,
+      "val_macro_f1": 0.882576577756147,
+      "sum_epoch_seconds": 2437.03
+    }
+  ],
+  "mean": {
+    "val_loss": 0.5375869404415938,
+    "val_accuracy": 0.8831355600973856,
+    "val_class_mean_accuracy": 0.883721536617084,
+    "val_macro_f1": 0.8816295889374629
+  }
+}

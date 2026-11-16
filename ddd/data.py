@@ -35,10 +35,13 @@ def train_transform(size=224, color_jitter=0.3, three_augment=True, flip=True):
     return transforms.Compose(steps)
 
 
-def eval_transform(size=224):
-    return transforms.Compose([transforms.Resize(size, interpolation=InterpolationMode.BICUBIC),
-                               transforms.CenterCrop(size), transforms.ToTensor(),
-                               transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)])
+def eval_transform(size=224, gray=False):
+    """`gray` gives each image in gray scale with 3 channels, as the gray step of 3-Augment."""
+    steps = [transforms.Resize(size, interpolation=InterpolationMode.BICUBIC), transforms.CenterCrop(size)]
+    if gray:
+        steps.append(transforms.Grayscale(3))
+    steps += [transforms.ToTensor(), transforms.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)]
+    return transforms.Compose(steps)
 
 
 class StateFarmImages(Dataset):

@@ -41,6 +41,7 @@ The research questions are:
 | D11 | 2026-11-15 | R1 steps the scheduler after each epoch, as ViT-DD does with Lightning 1.7.7. Config key `sched_after_epoch`. | Choice of the owner. The first code stepped it at the start of each epoch. See `results/vitdd_recipe_check.md`. |
 | D12 | 2026-11-15 | R1 gives the position embedding the weight decay 0.1, as `ViTDDLM` does. Config key `wd_skip_list`. | Choice of the owner. The first R1 run gave it no weight decay. The owner stopped that run after epoch 10. |
 | D13 | 2026-11-15 | The training runs of Phase 2 use the Colab L4, one run at a time. | Choice of the owner among 3 options. All runs have the same GPU and batch size, so their training times compare. |
+| D14 | 2026-11-15 | While a training job runs on Colab, the AI runs a short check cell at least every 30 minutes. | Choice of the owner. The runtime of `b0_f1` stopped after epoch 10 with no error in the logs. Colab can stop an idle runtime. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -303,6 +304,8 @@ Shared recipe of the development runs:
 - The augmentation set that wins E3. Before E3, the paper set.
 - Decision P13: batch size 128, weight decay 0.1, a warm-up from 0.000001, the scheduler step of D11, no drop path, 32-bit numbers.
 - The configs are `configs/b0.json` and `configs/e1_*.json`. The queue file `configs/queue_phase2.txt` gives the order of the runs.
+- `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
+- `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.
 
 ### 8.3 Training analysis
 
@@ -423,6 +426,7 @@ Cut rules:
 - One Claude Code session drives one notebook. This limit comes from the brief.
 - The session drives the notebook through the Colab MCP server. `CLAUDE.md` gives the steps.
 - Long jobs run in the background and write logs to Drive. Each epoch saves a checkpoint.
+- Decision D14: while a job runs, the session runs a short check cell at least every 30 minutes.
 
 Planned layout of the repository:
 
