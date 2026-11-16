@@ -59,6 +59,13 @@ def test_create_cnn_takes_no_img_size():
     assert m(torch.zeros(2, 3, 32, 32)).shape == (2, 10)
 
 
+def test_train_transform_with_no_augmentation_equals_eval_transform():
+    from ddd.data import train_transform
+    img = Image.fromarray(np.random.default_rng(0).integers(0, 255, (48, 64, 3), dtype=np.uint8))
+    none = train_transform(32, color_jitter=0, three_augment=False, flip=False, random_crop=False)
+    assert torch.equal(none(img), eval_transform(32)(img))
+
+
 def test_measure_counts_the_frames_after_the_warm_up():
     from ddd.speed import measure
     s = measure({"model": "resnet18", "input_size": 32}, torch.device("cpu"), frames=3, warmup=1)

@@ -98,7 +98,7 @@ def run(cfg, run_dir, max_steps=None):
     size = cfg.get("input_size", 224)
     train_ds = StateFarmImages(train_rows, cfg["data_root"],
                                train_transform(size, cfg["color_jitter"], cfg["three_augment"],
-                                               cfg["flip"]))
+                                               cfg["flip"], cfg.get("random_crop", True)))
     g = torch.Generator().manual_seed(cfg["seed"])
     train_dl = DataLoader(train_ds, batch_size=cfg["batch_size"], shuffle=True, drop_last=True,
                           num_workers=cfg["num_workers"], pin_memory=True, generator=g,

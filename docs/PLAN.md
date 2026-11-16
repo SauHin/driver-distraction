@@ -42,6 +42,9 @@ The research questions are:
 | D12 | 2026-11-15 | R1 gives the position embedding the weight decay 0.1, as `ViTDDLM` does. Config key `wd_skip_list`. | Choice of the owner. The first R1 run gave it no weight decay. The owner stopped that run after epoch 10. |
 | D13 | 2026-11-15 | The training runs of Phase 2 use the Colab L4, one run at a time. | Choice of the owner among 3 options. All runs have the same GPU and batch size, so their training times compare. |
 | D14 | 2026-11-15 | While a training job runs on Colab, the AI runs a short check cell at least every 30 minutes. | Choice of the owner. The runtime of `b0_f1` stopped after epoch 10 with no error in the logs. Colab can stop an idle runtime. |
+| D15 | 2026-11-16 | E2 uses DeiT-III Small. | Choice of the owner among 2 options. It has the highest E1 macro F1 and is the live candidate. See `results/development/e1.md`. |
+| D16 | 2026-11-16 | E3 uses DeiT-III Small. | Choice of the owner among 2 options. The plan named no model for E3. |
+| D17 | 2026-11-16 | E3 has no value with more gray images. | Choice of the owner among 2 options. B0 lost 3.58 points of macro F1 on gray validation images. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -65,6 +68,7 @@ The owner can change each of these decisions.
 | P12 | A development run gives the scores of its last epoch on its validation fold. | Phase 3 has no validation part to select an epoch. Decision P9 reads the last epoch too. |
 | P13 | Values that section 8.2 does not name come from the R1 config. | Each experiment then changes one variable from B0. |
 | P14 | The E1 models start from the default ImageNet-1k weights of `timm` 1.0.31. DeiT-III Base starts from the weight file of R1. | B0 and the DeiT-III Base of E1 then have the same start weights. |
+| P15 | The E3 value "None" has no random step. The random crop becomes a center crop, as in the evaluation. | The paper set lists the random crop as a step of the augmentation. See `results/vitdd_recipe_check.md`. |
 
 ## 3. Data
 
@@ -304,6 +308,8 @@ Shared recipe of the development runs:
 - The augmentation set that wins E3. Before E3, the paper set.
 - Decision P13: batch size 128, weight decay 0.1, a warm-up from 0.000001, the scheduler step of D11, no drop path, 32-bit numbers.
 - The configs are `configs/b0.json` and `configs/e1_*.json`. The queue file `configs/queue_phase2.txt` gives the order of the runs.
+- E2 and E3 change one key of `configs/e1_deit3_small.json` each. Their configs are `configs/e2_*.json` and `configs/e3_*.json`.
+- The ImageNet value of E2 and the paper-set value of E3 are the runs of `e1_deit3_small`.
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.
 - `scripts/score_gray.py` writes the confusion matrix, the scores of each class, and the scores of each driver for section 8.4.

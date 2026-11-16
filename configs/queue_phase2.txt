@@ -17,3 +17,12 @@ configs/e1_deit3_small.json 2
 configs/e1_deit3_base.json 0
 configs/e1_deit3_base.json 1
 configs/e1_deit3_base.json 2
+configs/e2_deit3_small_random.json 0
+configs/e2_deit3_small_random.json 1
+configs/e2_deit3_small_random.json 2
+configs/e3_deit3_small_noaug.json 0
+configs/e3_deit3_small_noaug.json 1
+configs/e3_deit3_small_noaug.json 2
+configs/e3_deit3_small_noflip.json 0
+configs/e3_deit3_small_noflip.json 1
+configs/e3_deit3_small_noflip.json 2

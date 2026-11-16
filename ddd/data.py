@@ -22,9 +22,11 @@ class _Solarize:
         return ImageOps.solarize(img)
 
 
-def train_transform(size=224, color_jitter=0.3, three_augment=True, flip=True):
-    steps = [transforms.Resize(size, interpolation=InterpolationMode.BICUBIC),
-             transforms.RandomCrop(size, padding=4, padding_mode="reflect")]
+def train_transform(size=224, color_jitter=0.3, three_augment=True, flip=True, random_crop=True):
+    """With all four options off, the steps equal `eval_transform`: no random step (decision P15)."""
+    crop = (transforms.RandomCrop(size, padding=4, padding_mode="reflect") if random_crop
+            else transforms.CenterCrop(size))
+    steps = [transforms.Resize(size, interpolation=InterpolationMode.BICUBIC), crop]
     if flip:
         steps.append(transforms.RandomHorizontalFlip())
     if three_augment:
