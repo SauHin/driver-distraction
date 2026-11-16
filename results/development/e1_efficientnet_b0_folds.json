@@ -1,0 +1,38 @@
+{
+  "config": "e1_efficientnet_b0",
+  "folds": [
+    {
+      "run": "e1_efficientnet_b0_f0",
+      "fold": 0,
+      "val_loss": 1.2074135516044846,
+      "val_accuracy": 0.7346669182864691,
+      "val_class_mean_accuracy": 0.7309689658606079,
+      "val_macro_f1": 0.7412556018624407,
+      "sum_epoch_seconds": 687.65
+    },
+    {
+      "run": "e1_efficientnet_b0_f1",
+      "fold": 1,
+      "val_loss": 1.1248509592435154,
+      "val_accuracy": 0.8151292209017167,
+      "val_class_mean_accuracy": 0.8143280373106858,
+      "val_macro_f1": 0.8117982054234375,
+      "sum_epoch_seconds": 687.48
+    },
+    {
+      "run": "e1_efficientnet_b0_f2",
+      "fold": 2,
+      "val_loss": 1.2146583810845148,
+      "val_accuracy": 0.7367427816569164,
+      "val_class_mean_accuracy": 0.7417004152153452,
+      "val_macro_f1": 0.7184558431727155,
+      "sum_epoch_seconds": 688.4
+    }
+  ],
+  "mean": {
+    "val_loss": 1.1823076306441715,
+    "val_accuracy": 0.7621796402817007,
+    "val_class_mean_accuracy": 0.7623324727955462,
+    "val_macro_f1": 0.7571698834861978
+  }
+}

@@ -23,6 +23,18 @@ def scores(m):
             "macro_f1": float(f1.mean())}
 
 
+def class_scores(m):
+    """Precision, recall, and F1 of each class. A class with no predictions has precision 0."""
+    m = np.asarray(m, dtype=np.float64)
+    tp, true_n, pred_n = np.diag(m), m.sum(axis=1), m.sum(axis=0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        precision = np.where(pred_n > 0, tp / pred_n, 0.0)
+        recall = np.where(true_n > 0, tp / true_n, 0.0)
+        f1 = np.where(true_n + pred_n > 0, 2 * tp / (true_n + pred_n), 0.0)
+    return [{"precision": float(p), "recall": float(r), "f1": float(f)}
+            for p, r, f in zip(precision, recall, f1)]
+
+
 def binary_scores(m):
     """Precision, recall, and F1 of the status "distracted": classes c1 to c9 against c0.
     A distracted image with the wrong distracted class still has the correct status."""

@@ -24,8 +24,9 @@ F1 is the validation macro F1. The mean validation loss is 0.5376 in color and 0
 - The change differs by fold, from 1.60 to 5.52 points of macro F1.
 - Thus B0 uses color, but most of its score stays with no color.
 
+`b0_errors.md` gives the change of each class and of each driver.
+
 ## Not checked
 
-- The change of each class and of each driver.
 - The score on an infrared camera. A gray copy of a color image is not an infrared image.
-- The code of this measure is not in git. `b0_gray.json` names the last commit, 6767bcc, but the code of the measure came after it.
+- `b0_gray.json` names commit f620f0b. The code of the tables of each driver and each class came after that commit. The scores in this file did not change.

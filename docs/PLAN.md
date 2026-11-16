@@ -306,6 +306,7 @@ Shared recipe of the development runs:
 - The configs are `configs/b0.json` and `configs/e1_*.json`. The queue file `configs/queue_phase2.txt` gives the order of the runs.
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.
+- `scripts/score_gray.py` writes the confusion matrix, the scores of each class, and the scores of each driver for section 8.4.
 
 ### 8.3 Training analysis
 

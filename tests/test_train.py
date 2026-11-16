@@ -13,7 +13,7 @@ from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD  # n
 from ddd.data import eval_transform  # noqa: E402
 from ddd.development import gray_scores  # noqa: E402
 from ddd.evaluate import evaluate_run  # noqa: E402
-from ddd.metrics import binary_scores, confusion, scores  # noqa: E402
+from ddd.metrics import binary_scores, class_scores, confusion, scores  # noqa: E402
 from ddd.models import create, load_weights, set_trainable  # noqa: E402
 from ddd.train import optimizer, pending_runs, run  # noqa: E402
 
@@ -24,6 +24,10 @@ def test_scores_from_confusion():
     assert s["accuracy"] == pytest.approx(3 / 5)
     assert s["class_mean_accuracy"] == pytest.approx((1 / 2 + 1 + 0) / 3)
     assert s["macro_f1"] == pytest.approx((2 / 4 + 4 / 5 + 0) / 3)
+    c = class_scores(m)
+    assert [x["f1"] for x in c] == pytest.approx([2 / 4, 4 / 5, 0])
+    assert [x["precision"] for x in c] == pytest.approx([1 / 2, 2 / 3, 0])
+    assert [x["recall"] for x in c] == pytest.approx([1 / 2, 1, 0])
     # Distracted: 2 found of 3, and 1 safe image called distracted.
     b = binary_scores(m)
     assert b["distracted_precision"] == pytest.approx(2 / 3)
@@ -154,6 +158,12 @@ def test_gray_scores_repeat_the_color_scores_of_the_run(tmp_path):
     assert f["images"] == 4 and 0 <= f["gray"]["val_accuracy"] <= 1
     assert f["color"]["val_accuracy"] == pytest.approx(f["file"]["val_accuracy"])
     assert f["color"]["val_loss"] == pytest.approx(f["file"]["val_loss"])
+    with open(tmp_path / "out" / "tiny_val_drivers.csv", newline="", encoding="utf-8") as fh:
+        rows = list(csv.DictReader(fh))
+    assert [(r["driver"], r["images"]) for r in rows] == [("p002", "4")]
+    assert float(rows[0]["color_accuracy"]) == pytest.approx(f["color"]["val_accuracy"])
+    with open(tmp_path / "out" / "tiny_val_confusion_gray.csv", newline="", encoding="utf-8") as fh:
+        assert sum(int(v) for r in list(csv.reader(fh))[1:] for v in r[1:]) == 4
     # The gray step gives 3 equal channels before the normalization.
     x = eval_transform(32, gray=True)(Image.new("RGB", (40, 32), (200, 50, 10)))
     raw = x * torch.tensor(IMAGENET_DEFAULT_STD)[:, None, None] + torch.tensor(IMAGENET_DEFAULT_MEAN)[:, None, None]
