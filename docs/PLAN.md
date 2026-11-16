@@ -307,6 +307,8 @@ Shared recipe of the development runs:
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.
 - `scripts/score_gray.py` writes the confusion matrix, the scores of each class, and the scores of each driver for section 8.4.
+- `scripts/measure_speed.py` measures the processed frames per second for decision P8, on the laptop GPU and CPU.
+- For P8, a frame is a 640x480 image through `eval_transform` and the model, one frame at a time. The camera read is not part of it.
 
 ### 8.3 Training analysis
 

@@ -59,6 +59,13 @@ def test_create_cnn_takes_no_img_size():
     assert m(torch.zeros(2, 3, 32, 32)).shape == (2, 10)
 
 
+def test_measure_counts_the_frames_after_the_warm_up():
+    from ddd.speed import measure
+    s = measure({"model": "resnet18", "input_size": 32}, torch.device("cpu"), frames=3, warmup=1)
+    assert s["frames"] == 3 and s["frames_per_second"] > 0 and s["median_ms_per_frame"] > 0
+    assert s["parameters"] > 0 and s["weights_mb"] > 0
+
+
 def test_pending_runs_skips_complete_runs(tmp_path):
     q = tmp_path / "queue.txt"
     q.write_text("# config fold\nconfigs/b0.json 0\n\nconfigs/b0.json 1  # second\n", encoding="utf-8")

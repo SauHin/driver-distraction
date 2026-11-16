@@ -1,0 +1,38 @@
+{
+  "config": "e1_resnet50",
+  "folds": [
+    {
+      "run": "e1_resnet50_f0",
+      "fold": 0,
+      "val_loss": 0.8224450398625281,
+      "val_accuracy": 0.8684657482543876,
+      "val_class_mean_accuracy": 0.8626346548512537,
+      "val_macro_f1": 0.8658244975300651,
+      "sum_epoch_seconds": 1079.67
+    },
+    {
+      "run": "e1_resnet50_f1",
+      "fold": 1,
+      "val_loss": 0.8253787992090982,
+      "val_accuracy": 0.878513488021128,
+      "val_class_mean_accuracy": 0.8793461537065582,
+      "val_macro_f1": 0.8775242619239121,
+      "sum_epoch_seconds": 1079.33
+    },
+    {
+      "run": "e1_resnet50_f2",
+      "fold": 2,
+      "val_loss": 1.0528035114161989,
+      "val_accuracy": 0.7897716550292508,
+      "val_class_mean_accuracy": 0.7903389169669134,
+      "val_macro_f1": 0.7904089776487478,
+      "sum_epoch_seconds": 1079.66
+    }
+  ],
+  "mean": {
+    "val_loss": 0.9002091168292751,
+    "val_accuracy": 0.8455836304349221,
+    "val_class_mean_accuracy": 0.8441065751749085,
+    "val_macro_f1": 0.8445859123675751
+  }
+}

@@ -89,6 +89,7 @@ python scripts/train.py configs/b0.json --fold 0
 python scripts/run_queue.py configs/queue_phase2.txt --runs runs --logs logs
 python scripts/summarize_folds.py "G:/My Drive/driver-distraction/runs" b0
 python scripts/score_gray.py "G:/My Drive/driver-distraction/runs" b0
+python scripts/measure_speed.py configs/e1_deit3_small.json configs/e1_resnet50.json
 python scripts/record_speed.py runs/RUN_NAME --key laptop
 ```
 
@@ -103,6 +104,7 @@ python scripts/record_speed.py runs/RUN_NAME --key laptop
 - `run_queue.py` trains the runs of a queue file one at a time. It skips each run with a `metrics.json`.
 - `summarize_folds.py` copies the files of the 3 fold runs to `results/development/` and writes their mean scores.
 - `score_gray.py` scores the 3 fold runs on their validation drivers in color and in gray scale. It writes the tables of each class and each driver too.
+- `measure_speed.py` measures the processed frames per second of each config on this computer. It writes `results/development/speed_laptop.json`.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
 
