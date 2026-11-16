@@ -1,0 +1,9 @@
+{
+  "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+  "python": "3.10.9",
+  "torch": "2.6.0+cu124",
+  "torchvision": "0.21.0+cu124",
+  "timm": "1.0.31",
+  "cuda": "12.4",
+  "git_commit": "dff20a6691db38fa6e3dba0d758c037465bea248"
+}

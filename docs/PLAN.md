@@ -45,6 +45,7 @@ The research questions are:
 | D15 | 2026-11-16 | E2 uses DeiT-III Small. | Choice of the owner among 2 options. It has the highest E1 macro F1 and is the live candidate. See `results/development/e1.md`. |
 | D16 | 2026-11-16 | E3 uses DeiT-III Small. | Choice of the owner among 2 options. The plan named no model for E3. |
 | D17 | 2026-11-16 | E3 has no value with more gray images. | Choice of the owner among 2 options. B0 lost 3.58 points of macro F1 on gray validation images. |
+| D18 | 2026-11-16 | E2 adds MobileNetV3-Large with random weights. Its ImageNet value is the E1 run. | Choice of the owner among 2 options. DeiT-III Small with random weights did not learn. See `results/development/e2_checks.md`. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -310,6 +311,8 @@ Shared recipe of the development runs:
 - The configs are `configs/b0.json` and `configs/e1_*.json`. The queue file `configs/queue_phase2.txt` gives the order of the runs.
 - E2 and E3 change one key of `configs/e1_deit3_small.json` each. Their configs are `configs/e2_*.json` and `configs/e3_*.json`.
 - The ImageNet value of E2 and the paper-set value of E3 are the runs of `e1_deit3_small`.
+- Decision D18 adds `configs/e2_mobilenetv3_large_random.json`. Its ImageNet value is the runs of `e1_mobilenetv3_large`.
+- The config key `init_values` sets the start value of the layer scales of a ViT. Only the checks of `results/development/e2_checks.md` use it.
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.
 - `scripts/score_gray.py` writes the confusion matrix, the scores of each class, and the scores of each driver for section 8.4.

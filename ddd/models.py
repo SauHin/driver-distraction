@@ -34,6 +34,9 @@ def create(cfg):
     name, weights = cfg["model"], cfg.get("weights")
     # The CNN classes of timm take no `img_size`.
     size = {"img_size": cfg.get("input_size", 224)} if name.startswith(("vit_", "deit")) else {}
+    # `init_values` is the start value of the layer scales. DeiT-III of timm starts them at 1e-6.
+    if "init_values" in cfg:
+        size["init_values"] = cfg["init_values"]
     model = timm.create_model(name, pretrained=weights == "timm", num_classes=10,
                               drop_rate=cfg.get("drop", 0.0),
                               drop_path_rate=cfg.get("drop_path", 0.0), **size)

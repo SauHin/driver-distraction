@@ -59,6 +59,12 @@ def test_create_cnn_takes_no_img_size():
     assert m(torch.zeros(2, 3, 32, 32)).shape == (2, 10)
 
 
+def test_create_sets_the_start_value_of_the_layer_scales():
+    cfg = {"model": "deit3_small_patch16_224", "weights": None, "input_size": 32}
+    assert torch.allclose(create(cfg).blocks[0].ls1.gamma, torch.tensor(1e-6))
+    assert torch.allclose(create({**cfg, "init_values": 1e-4}).blocks[0].ls1.gamma, torch.tensor(1e-4))
+
+
 def test_train_transform_with_no_augmentation_equals_eval_transform():
     from ddd.data import train_transform
     img = Image.fromarray(np.random.default_rng(0).integers(0, 255, (48, 64, 3), dtype=np.uint8))
