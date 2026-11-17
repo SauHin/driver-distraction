@@ -150,6 +150,7 @@ The test lock has these rules:
 - Only two points score the test drivers: the replication (section 7) and the final evaluation (section 9).
 - The data loader refuses the test part unless a run sets the unlock flag.
 - Each unlock writes a row to `results/test_access_log.csv`. The row holds the time, the git commit, and the reason.
+- Status on 2026-11-17: the log holds both rows. The test lock has no unlock left.
 - No design choice reads a score of the test drivers.
 - The own test persons follow the same lock. Only the final evaluation scores them.
 
@@ -352,7 +353,8 @@ Phase 2 ends with two models:
 The owner approves the two models before Phase 3.
 
 Status on 2026-11-17: decision D19 selects one model for `best` and `live`. Thus step 1 of Phase 3 is one run.
-The config of that run is `configs/final_deit3_small_noflip.json`. Its result is TBD.
+The config of that run is `configs/final_deit3_small_noflip.json`.
+On 2026-11-17, steps 1 and 2 of Phase 3 ran. See `results/final/scores.md`. Steps 4 to 7 are TBD.
 
 ## 9. Phase 3: final evaluation
 
