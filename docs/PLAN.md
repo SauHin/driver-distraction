@@ -437,6 +437,9 @@ Rules for the report:
 - Each claim names its result file.
 - Figures with persons come from own recordings with consent.
 
+Status on 2026-11-17: `docs/report/draft.md` holds a draft of sections 1 to 7, written by the AI from the result files.
+The owner checks and rewrites it. The figures, the bootstrap interval of section 5, and sections 8 to 10 are TBD.
+
 ## 12. Schedule
 
 The exact deadline is TBD. Week 4 depends on the deadline.
