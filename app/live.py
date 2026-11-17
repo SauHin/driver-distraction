@@ -9,7 +9,7 @@ import cv2
 import torch
 
 from ddd.data import CODES, eval_transform
-from ddd.live import NAMES, Smoother, class_scores, load_model, prepare
+from ddd.live import NAMES, Smoother, class_scores, load_model, prepare, true_class
 
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".bmp")
 
@@ -38,9 +38,15 @@ def frames(source):
         cap.release()
 
 
-def draw(frame, mean, k, distracted, alert, fps):
-    """The status, the class, the speed, and a bar for each class score, on a copy of the frame."""
+def draw(frame, mean, k, distracted, alert, fps, truth=None):
+    """The status, the class, the speed, and a bar for each class score, on a copy of the frame.
+    `truth` is the true class of a demo video, in green if the prediction is equal to it."""
     out = frame.copy()
+    if truth is not None:
+        y = out.shape[0] - 62
+        cv2.rectangle(out, (0, y - 22), (out.shape[1], y + 8), (0, 0, 0), -1)
+        cv2.putText(out, f"true: {truth} {NAMES[int(truth[1:])]}", (10, y), cv2.FONT_HERSHEY_SIMPLEX, 0.6,
+                    (0, 200, 0) if truth == CODES[k] else (0, 200, 255), 2)
     color = (0, 0, 255) if distracted else (0, 160, 0)  # BGR: red or green
     cv2.rectangle(out, (0, 0), (out.shape[1], 64), (0, 0, 0), -1)
     cv2.putText(out, "DISTRACTED" if distracted else "SAFE", (10, 28), cv2.FONT_HERSHEY_SIMPLEX, 0.9, color, 2)
@@ -68,7 +74,12 @@ def main():
     p.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     p.add_argument("--no-show", action="store_true", help="no window: write the log only")
     p.add_argument("--max-frames", type=int, default=None)
+    p.add_argument("--truth", default=None, help="true classes of a demo video, from scripts/make_demo_video.py")
     a = p.parse_args()
+    schedule = None
+    if a.truth:
+        with open(a.truth, newline="", encoding="utf-8") as f:
+            schedule = [(float(r["start_seconds"]), r["class"]) for r in csv.DictReader(f)]
 
     device = torch.device(a.device)
     model, cfg = load_model(a.run, device)
@@ -79,7 +90,7 @@ def main():
     fps, last = 0.0, time.perf_counter()
     with open(log_path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["time", "frame", "class", "name", "score", "distracted", "alert", "fps"] + CODES)
+        w.writerow(["time", "frame", "class", "name", "score", "distracted", "alert", "fps", "true"] + CODES)
         for n, (frame, t) in enumerate(frames(a.source)):
             if a.max_frames is not None and n >= a.max_frames:
                 break
@@ -87,10 +98,11 @@ def main():
             now = time.perf_counter()
             fps = 1 / (now - last) if n == 0 else 0.9 * fps + 0.1 / (now - last)
             last = now
+            truth = true_class(schedule, t) if schedule else None
             w.writerow([f"{t:.3f}", n, CODES[k], NAMES[k], f"{mean[k]:.4f}", int(distracted), int(alert),
-                        f"{fps:.2f}"] + [f"{s:.4f}" for s in mean])
+                        f"{fps:.2f}", truth or ""] + [f"{s:.4f}" for s in mean])
             if not a.no_show:
-                cv2.imshow("Driver distraction (demo)", draw(frame, mean, k, distracted, alert, fps))
+                cv2.imshow("Driver distraction (demo)", draw(frame, mean, k, distracted, alert, fps, truth))
                 one_image = Path(a.source).suffix.lower() in IMAGE_SUFFIXES
                 if cv2.waitKey(0 if one_image else 1) & 0xFF == ord("q"):
                     break

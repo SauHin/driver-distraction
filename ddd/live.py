@@ -1,5 +1,6 @@
 """Live prediction for the application of docs/PLAN.md section 10. A frame goes through the
 steps of `eval_transform`. The class scores are smoothed over the last frames."""
+import bisect
 import collections
 import json
 from pathlib import Path
@@ -8,6 +9,7 @@ import numpy as np
 import torch
 from PIL import Image
 
+from ddd.data import CODES
 from ddd.models import create
 
 # The class names of docs/PLAN.md section 3.4, in the order of the StateFarm codes c0 to c9.
@@ -57,3 +59,17 @@ class Smoother:
         elif self.since is None:
             self.since = now
         return mean, k, distracted, distracted and now - self.since >= self.alert_seconds
+
+
+def demo_rows(rows, driver, per_class):
+    """Up to `per_class` label rows of each class c0 to c9 of one driver, in class order."""
+    out = []
+    for code in CODES:
+        out += [r for r in rows if r["subject"] == driver and r["classname"] == code][:per_class]
+    return out
+
+
+def true_class(schedule, t):
+    """The class of a demo video at second `t`. `schedule` is a sorted list of (start second, class)."""
+    i = bisect.bisect_right([s for s, _ in schedule], t) - 1
+    return schedule[i][1] if i >= 0 else None

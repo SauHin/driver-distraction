@@ -398,6 +398,8 @@ Rules for the application:
 
 Status on 2026-11-17: `app/live.py` and `ddd/live.py` do steps 1 to 7. `tests/test_live.py` holds the test of the frame preparation.
 The guide for the camera position is TBD. The application did not read a camera yet.
+`scripts/make_demo_video.py` makes demo videos of the development drivers, with the true class of each part. No test driver is read.
+A demo video uses the fold model that did not train on that driver. The demo is not a result for the report.
 
 User test:
 

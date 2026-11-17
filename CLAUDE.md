@@ -95,7 +95,12 @@ python scripts/measure_speed.py configs/e1_deit3_small.json configs/e1_resnet50.
 python scripts/record_speed.py runs/RUN_NAME --key laptop
 python app/live.py 0
 python app/live.py VIDEO.mp4 --no-show
+python scripts/make_demo_video.py all
+python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --truth data/demo/p014_truth.csv
 ```
+
+- `make_demo_video.py` makes a video of each development driver in `data/demo/`, with the classes c0 to c9 in order.
+- A demo video uses the fold model with that driver in its validation part. The script prints the run folder.
 
 - `app/live.py` runs the live application on a camera number, a video file, or an image file. Press q to stop.
 - `app/live.py` reads `runs/final_deit3_small_noflip/` by default. Copy `config.json` and `last.pt` of that run from Drive.
