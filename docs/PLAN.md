@@ -46,6 +46,7 @@ The research questions are:
 | D16 | 2026-11-16 | E3 uses DeiT-III Small. | Choice of the owner among 2 options. The plan named no model for E3. |
 | D17 | 2026-11-16 | E3 has no value with more gray images. | Choice of the owner among 2 options. B0 lost 3.58 points of macro F1 on gray validation images. |
 | D18 | 2026-11-16 | E2 adds MobileNetV3-Large with random weights. Its ImageNet value is the E1 run. | Choice of the owner among 2 options. DeiT-III Small with random weights did not learn. See `results/development/e2_checks.md`. |
+| D19 | 2026-11-17 | `best` and `live` are one model: DeiT-III Small with the paper set and no flip, `configs/e3_deit3_small_noflip.json`. | Approval of the owner after E4. It has the highest mean macro F1, 89.39, and reaches P8. Its lower status recall is in `results/development/e3_errors.md`. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -349,6 +350,9 @@ Phase 2 ends with two models:
 - `live`: the model with the highest mean macro F1 among the models that reach the speed target P8.
 
 The owner approves the two models before Phase 3.
+
+Status on 2026-11-17: decision D19 selects one model for `best` and `live`. Thus step 1 of Phase 3 is one run.
+The config of that run is `configs/final_deit3_small_noflip.json`. Its result is TBD.
 
 ## 9. Phase 3: final evaluation
 

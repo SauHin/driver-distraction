@@ -14,10 +14,11 @@ The deliverables are a working application and a technical report.
 
 The folder `docs/starter/` and the file `docs/AI_LOG.md` are not in git.
 
-## State on 2026-11-15
+## State on 2026-11-17
 
 - Phase 0 is complete. R1 passed gate G1. See `results/replication/scores.md`.
-- Phase 2 started after a yes of the owner. The runs use the Colab L4, one run at a time (decision D13).
+- Phase 2 ran B0 and E1 to E4 on the Colab L4, one run at a time (decision D13). See `results/development/`.
+- The owner approved one model for `best` and `live` (decision D19). Phase 3 starts with `configs/final_deit3_small_noflip.json`.
 - The public ViT-DD weights, face crops, and emotion labels do not download. See `results/vitdd_public_files.md`.
 - The owner selected StateFarm as the only dataset. AUC v2 is cancelled (decision D7).
 - The replication target is R1, the standard ViT of the ViT-DD paper, with the public split by driver (decision D9).
