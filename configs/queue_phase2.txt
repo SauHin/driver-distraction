@@ -29,3 +29,9 @@ configs/e3_deit3_small_noflip.json 2
 configs/e2_mobilenetv3_large_random.json 0
 configs/e2_mobilenetv3_large_random.json 1
 configs/e2_mobilenetv3_large_random.json 2
+configs/e4_deit3_small_lr1e-4.json 0
+configs/e4_deit3_small_lr1e-4.json 1
+configs/e4_deit3_small_lr1e-4.json 2
+configs/e4_deit3_small_lr9e-4.json 0
+configs/e4_deit3_small_lr9e-4.json 1
+configs/e4_deit3_small_lr9e-4.json 2

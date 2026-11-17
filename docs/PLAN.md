@@ -71,6 +71,7 @@ The owner can change each of these decisions.
 | P14 | The E1 models start from the default ImageNet-1k weights of `timm` 1.0.31. DeiT-III Base starts from the weight file of R1. | B0 and the DeiT-III Base of E1 then have the same start weights. |
 | P15 | The E3 value "None" has no random step. The random crop becomes a center crop, as in the evaluation. | The paper set lists the random crop as a step of the augmentation. See `results/vitdd_recipe_check.md`. |
 | P16 | The E3 value with the highest mean validation macro F1 wins E3. The paper set with no flip wins. | Section 8.5 selects models by the same score. See `results/development/e3.md`. |
+| P17 | E4 uses the winner of E3: DeiT-III Small with the paper set and no flip. The values are 0.0001, 0.0003, and 0.0009. | The owner waits for E4 before the choice of section 8.5. The value 0.0003 is the run `e3_deit3_small_noflip`. |
 
 ## 3. Data
 
@@ -313,6 +314,7 @@ Shared recipe of the development runs:
 - E2 and E3 change one key of `configs/e1_deit3_small.json` each. Their configs are `configs/e2_*.json` and `configs/e3_*.json`.
 - The ImageNet value of E2 and the paper-set value of E3 are the runs of `e1_deit3_small`.
 - Decision D18 adds `configs/e2_mobilenetv3_large_random.json`. Its ImageNet value is the runs of `e1_mobilenetv3_large`.
+- Decision P17 adds `configs/e4_deit3_small_lr1e-4.json` and `configs/e4_deit3_small_lr9e-4.json`.
 - The config key `init_values` sets the start value of the layer scales of a ViT. Only the checks of `results/development/e2_checks.md` use it.
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.

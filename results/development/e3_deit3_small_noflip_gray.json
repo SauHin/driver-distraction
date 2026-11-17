@@ -1,0 +1,103 @@
+{
+  "config": "e3_deit3_small_noflip",
+  "folds": [
+    {
+      "run": "e3_deit3_small_noflip_f0",
+      "fold": 0,
+      "images": 5299,
+      "file": {
+        "val_loss": 0.8139921717203705,
+        "val_accuracy": 0.8888469522551424,
+        "val_class_mean_accuracy": 0.8789501453985578,
+        "val_macro_f1": 0.8762999622956278
+      },
+      "color": {
+        "val_loss": 0.8139921648589187,
+        "val_accuracy": 0.8888469522551424,
+        "val_class_mean_accuracy": 0.8789501453985578,
+        "val_macro_f1": 0.8762999622956278
+      },
+      "gray": {
+        "val_loss": 0.8457848796261371,
+        "val_accuracy": 0.8784676354029062,
+        "val_class_mean_accuracy": 0.8683469827958982,
+        "val_macro_f1": 0.8660224040113518
+      }
+    },
+    {
+      "run": "e3_deit3_small_noflip_f1",
+      "fold": 1,
+      "images": 5301,
+      "file": {
+        "val_loss": 0.7198831840093081,
+        "val_accuracy": 0.9213355970571591,
+        "val_class_mean_accuracy": 0.9214617705687227,
+        "val_macro_f1": 0.9214878878995142
+      },
+      "color": {
+        "val_loss": 0.7198831960179405,
+        "val_accuracy": 0.9213355970571591,
+        "val_class_mean_accuracy": 0.9214617705687227,
+        "val_macro_f1": 0.9214878878995142
+      },
+      "gray": {
+        "val_loss": 0.7399354110549383,
+        "val_accuracy": 0.9186945859271836,
+        "val_class_mean_accuracy": 0.918966985440383,
+        "val_macro_f1": 0.9179888803440731
+      }
+    },
+    {
+      "run": "e3_deit3_small_noflip_f2",
+      "fold": 2,
+      "images": 5299,
+      "file": {
+        "val_loss": 0.8093309518548087,
+        "val_accuracy": 0.8852613700698245,
+        "val_class_mean_accuracy": 0.8876254545688264,
+        "val_macro_f1": 0.8838637964170648
+      },
+      "color": {
+        "val_loss": 0.8093309647903327,
+        "val_accuracy": 0.8852613700698245,
+        "val_class_mean_accuracy": 0.8876254545688264,
+        "val_macro_f1": 0.8838637964170648
+      },
+      "gray": {
+        "val_loss": 0.8718322683761965,
+        "val_accuracy": 0.8629930175504812,
+        "val_class_mean_accuracy": 0.8639763187724284,
+        "val_macro_f1": 0.8599448123136595
+      }
+    }
+  ],
+  "mean": {
+    "file": {
+      "val_loss": 0.7810687691948291,
+      "val_accuracy": 0.8984813064607087,
+      "val_class_mean_accuracy": 0.8960124568453689,
+      "val_macro_f1": 0.893883882204069
+    },
+    "color": {
+      "val_loss": 0.7810687752223973,
+      "val_accuracy": 0.8984813064607087,
+      "val_class_mean_accuracy": 0.8960124568453689,
+      "val_macro_f1": 0.893883882204069
+    },
+    "gray": {
+      "val_loss": 0.8191841863524241,
+      "val_accuracy": 0.8867184129601903,
+      "val_class_mean_accuracy": 0.8837634290029032,
+      "val_macro_f1": 0.8813186988896948
+    }
+  },
+  "environment": {
+    "gpu": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "python": "3.10.9",
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "timm": "1.0.31",
+    "cuda": "12.4",
+    "git_commit": "2f2089644e52adff946d514b89cd6e3a8f9ca4be"
+  }
+}
