@@ -70,6 +70,7 @@ The owner can change each of these decisions.
 | P13 | Values that section 8.2 does not name come from the R1 config. | Each experiment then changes one variable from B0. |
 | P14 | The E1 models start from the default ImageNet-1k weights of `timm` 1.0.31. DeiT-III Base starts from the weight file of R1. | B0 and the DeiT-III Base of E1 then have the same start weights. |
 | P15 | The E3 value "None" has no random step. The random crop becomes a center crop, as in the evaluation. | The paper set lists the random crop as a step of the augmentation. See `results/vitdd_recipe_check.md`. |
+| P16 | The E3 value with the highest mean validation macro F1 wins E3. The paper set with no flip wins. | Section 8.5 selects models by the same score. See `results/development/e3.md`. |
 
 ## 3. Data
 

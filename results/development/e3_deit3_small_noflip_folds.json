@@ -1,0 +1,38 @@
+{
+  "config": "e3_deit3_small_noflip",
+  "folds": [
+    {
+      "run": "e3_deit3_small_noflip_f0",
+      "fold": 0,
+      "val_loss": 0.8139921717203705,
+      "val_accuracy": 0.8888469522551424,
+      "val_class_mean_accuracy": 0.8789501453985578,
+      "val_macro_f1": 0.8762999622956278,
+      "sum_epoch_seconds": 1075.0
+    },
+    {
+      "run": "e3_deit3_small_noflip_f1",
+      "fold": 1,
+      "val_loss": 0.7198831840093081,
+      "val_accuracy": 0.9213355970571591,
+      "val_class_mean_accuracy": 0.9214617705687227,
+      "val_macro_f1": 0.9214878878995142,
+      "sum_epoch_seconds": 1073.27
+    },
+    {
+      "run": "e3_deit3_small_noflip_f2",
+      "fold": 2,
+      "val_loss": 0.8093309518548087,
+      "val_accuracy": 0.8852613700698245,
+      "val_class_mean_accuracy": 0.8876254545688264,
+      "val_macro_f1": 0.8838637964170648,
+      "sum_epoch_seconds": 1073.71
+    }
+  ],
+  "mean": {
+    "val_loss": 0.7810687691948291,
+    "val_accuracy": 0.8984813064607087,
+    "val_class_mean_accuracy": 0.8960124568453689,
+    "val_macro_f1": 0.893883882204069
+  }
+}
