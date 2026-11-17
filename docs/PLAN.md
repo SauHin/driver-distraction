@@ -47,6 +47,7 @@ The research questions are:
 | D17 | 2026-11-16 | E3 has no value with more gray images. | Choice of the owner among 2 options. B0 lost 3.58 points of macro F1 on gray validation images. |
 | D18 | 2026-11-16 | E2 adds MobileNetV3-Large with random weights. Its ImageNet value is the E1 run. | Choice of the owner among 2 options. DeiT-III Small with random weights did not learn. See `results/development/e2_checks.md`. |
 | D19 | 2026-11-17 | `best` and `live` are one model: DeiT-III Small with the paper set and no flip, `configs/e3_deit3_small_noflip.json`. | Approval of the owner after E4. It has the highest mean macro F1, 89.39, and reaches P8. Its lower status recall is in `results/development/e3_errors.md`. |
+| D20 | 2026-11-17 | Step 5 of section 9, the changed test images, is part of the final evaluation. | Choice of the owner among 2 options. Section 9 lists step 5 in the final evaluation. No design choice uses its scores. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -73,6 +74,7 @@ The owner can change each of these decisions.
 | P15 | The E3 value "None" has no random step. The random crop becomes a center crop, as in the evaluation. | The paper set lists the random crop as a step of the augmentation. See `results/vitdd_recipe_check.md`. |
 | P16 | The E3 value with the highest mean validation macro F1 wins E3. The paper set with no flip wins. | Section 8.5 selects models by the same score. See `results/development/e3.md`. |
 | P17 | E4 uses the winner of E3: DeiT-III Small with the paper set and no flip. The values are 0.0001, 0.0003, and 0.0009. | The owner waits for E4 before the choice of section 8.5. The value 0.0003 is the run `e3_deit3_small_noflip`. |
+| P18 | The first application takes the mean scores of the last 5 frames. It gives the alert after 2.0 seconds of a distracted status. | First values with no data. E8 compares smoothing on own video. The options `--window` and `--alert-seconds` change them. |
 
 ## 3. Data
 
@@ -150,7 +152,8 @@ The test lock has these rules:
 - Only two points score the test drivers: the replication (section 7) and the final evaluation (section 9).
 - The data loader refuses the test part unless a run sets the unlock flag.
 - Each unlock writes a row to `results/test_access_log.csv`. The row holds the time, the git commit, and the reason.
-- Status on 2026-11-17: the log holds both rows. The test lock has no unlock left.
+- Status on 2026-11-17: the log holds the rows of R1 and of the final test evaluation.
+- Decision D20: step 5 of section 9 is part of the final evaluation. Each of its runs adds a row with the reason "Phase 3 step 5".
 - No design choice reads a score of the test drivers.
 - The own test persons follow the same lock. Only the final evaluation scores them.
 
@@ -392,6 +395,9 @@ Rules for the application:
 - A test compares its preparation of a frame with the evaluation code.
 - A guide tells the user where to put the camera.
 - The application is a demonstration. It is not a safety system for the road.
+
+Status on 2026-11-17: `app/live.py` and `ddd/live.py` do steps 1 to 7. `tests/test_live.py` holds the test of the frame preparation.
+The guide for the camera position is TBD. The application did not read a camera yet.
 
 User test:
 

@@ -19,7 +19,7 @@ The folder `docs/starter/` and the file `docs/AI_LOG.md` are not in git.
 - Phase 0 is complete. R1 passed gate G1. See `results/replication/scores.md`.
 - Phase 2 ran B0 and E1 to E4 on the Colab L4, one run at a time (decision D13). See `results/development/`.
 - The owner approved one model for `best` and `live` (decision D19). Phase 3 trained it with `configs/final_deit3_small_noflip.json`.
-- The final evaluation scored the test drivers. See `results/final/scores.md`. The test lock has no unlock left.
+- The final evaluation scored the test drivers. See `results/final/scores.md`. Only the steps of PLAN section 9 read them again (decision D20).
 - The public ViT-DD weights, face crops, and emotion labels do not download. See `results/vitdd_public_files.md`.
 - The owner selected StateFarm as the only dataset. AUC v2 is cancelled (decision D7).
 - The replication target is R1, the standard ViT of the ViT-DD paper, with the public split by driver (decision D9).
@@ -80,7 +80,7 @@ Run the commands from the root of the repository. On Windows, use `.venv/Scripts
 
 ```
 python -m venv .venv
-python -m pip install -e ".[test,train]"
+python -m pip install -e ".[test,train,app]"
 python -m pytest -q
 python scripts/make_split.py
 python scripts/audit_statefarm.py
@@ -93,7 +93,13 @@ python scripts/summarize_folds.py "G:/My Drive/driver-distraction/runs" b0
 python scripts/score_gray.py "G:/My Drive/driver-distraction/runs" b0
 python scripts/measure_speed.py configs/e1_deit3_small.json configs/e1_resnet50.json
 python scripts/record_speed.py runs/RUN_NAME --key laptop
+python app/live.py 0
+python app/live.py VIDEO.mp4 --no-show
 ```
+
+- `app/live.py` runs the live application on a camera number, a video file, or an image file. Press q to stop.
+- `app/live.py` reads `runs/final_deit3_small_noflip/` by default. Copy `config.json` and `last.pt` of that run from Drive.
+- `app/live.py` writes a log to `runs/live_logs/`. The alert time of a video uses the position in the file.
 
 - `make_split.py` reads the public ViT-DD lists in `data/external/vitdd/annotations/SFDDD/`.
 - `make_split.py` writes split v2. Use `--version v1` for split v1.
