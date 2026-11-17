@@ -105,6 +105,7 @@ python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --trut
 - `app/live.py` runs the live application on a camera number, a video file, or an image file. Press q to stop.
 - `app/live.py` reads `runs/final_deit3_small_noflip/` by default. Copy `config.json` and `last.pt` of that run from Drive.
 - `app/live.py` writes a log to `runs/live_logs/`. The alert time of a video uses the position in the file.
+- In a right-hand-drive car, run `app/live.py` with `--mirror` (decision D21). `docs/recording/GUIDE.md` gives the camera position.
 
 - `make_split.py` reads the public ViT-DD lists in `data/external/vitdd/annotations/SFDDD/`.
 - `make_split.py` writes split v2. Use `--version v1` for split v1.
@@ -118,6 +119,7 @@ python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --trut
 - `summarize_folds.py` copies the files of the 3 fold runs to `results/development/` and writes their mean scores.
 - `score_gray.py` scores the 3 fold runs on their validation drivers in color and in gray scale. It writes the tables of each class and each driver too.
 - `measure_speed.py` measures the processed frames per second of each config on this computer. It writes `results/development/speed_laptop.json`.
+- `evaluate_changes.py` scores a run on changed test images, for step 5 of PLAN section 9. Each call opens the test lock one time.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
 

@@ -6,7 +6,7 @@ torch = pytest.importorskip("torch")
 pytest.importorskip("timm")
 
 from ddd.data import eval_transform  # noqa: E402
-from ddd.live import Smoother, demo_rows, prepare, true_class  # noqa: E402
+from ddd.live import HAND_SWAP, Smoother, demo_rows, prepare, true_class  # noqa: E402
 
 
 def test_prepare_equals_eval_transform_of_the_rgb_image():
@@ -53,3 +53,15 @@ def test_true_class_follows_the_schedule():
     schedule = [(0.0, "c0"), (3.0, "c1"), (6.0, "c2")]
     assert [true_class(schedule, t) for t in (0.0, 2.9, 3.0, 9.0)] == ["c0", "c0", "c1", "c2"]
     assert true_class(schedule, -1.0) is None
+
+
+def test_mirror_flips_the_frame_and_swaps_only_the_hand_classes():
+    bgr = np.random.default_rng(1).integers(0, 255, (48, 64, 3), dtype=np.uint8)
+    tf = eval_transform(32)
+    assert torch.equal(prepare(bgr, tf, mirror=True), tf(Image.fromarray(bgr[:, ::-1, ::-1].copy())))
+    # The model sees "texting, right hand" in the flipped frame: the driver uses the left hand.
+    assert int(_scores(1)[HAND_SWAP].argmax()) == 3
+    assert int(_scores(4)[HAND_SWAP].argmax()) == 2
+    assert [int(_scores(k)[HAND_SWAP].argmax()) for k in (0, 5, 6, 7, 8, 9)] == [0, 5, 6, 7, 8, 9]
+    # A second swap gives the first order back.
+    assert [HAND_SWAP[i] for i in HAND_SWAP] == list(range(10))

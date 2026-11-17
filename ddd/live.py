@@ -18,9 +18,16 @@ NAMES = ["safe driving", "texting, right hand", "phone call, right hand", "texti
          "talking to passenger"]
 
 
-def prepare(frame_bgr, tf):
-    """An OpenCV frame (BGR, uint8) to the input of the model. OpenCV gives BGR, the model takes RGB."""
-    return tf(Image.fromarray(np.ascontiguousarray(frame_bgr[:, :, ::-1])))
+# Decision D21: in a right-hand-drive car, the app flips each frame. A flip turns the right hand of the
+# driver into a left hand in the image, so the scores of c1 and c3, and of c2 and c4, change places.
+HAND_SWAP = [0, 3, 4, 1, 2, 5, 6, 7, 8, 9]
+
+
+def prepare(frame_bgr, tf, mirror=False):
+    """An OpenCV frame (BGR, uint8) to the input of the model. OpenCV gives BGR, the model takes RGB.
+    `mirror` flips the frame left to right first (decision D21)."""
+    rgb = frame_bgr[:, ::-1, ::-1] if mirror else frame_bgr[:, :, ::-1]
+    return tf(Image.fromarray(np.ascontiguousarray(rgb)))
 
 
 def load_model(run_dir, device):

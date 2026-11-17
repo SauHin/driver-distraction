@@ -9,7 +9,7 @@ import cv2
 import torch
 
 from ddd.data import CODES, eval_transform
-from ddd.live import NAMES, Smoother, class_scores, load_model, prepare, true_class
+from ddd.live import HAND_SWAP, NAMES, Smoother, class_scores, load_model, prepare, true_class
 
 IMAGE_SUFFIXES = (".jpg", ".jpeg", ".png", ".bmp")
 
@@ -75,6 +75,8 @@ def main():
     p.add_argument("--no-show", action="store_true", help="no window: write the log only")
     p.add_argument("--max-frames", type=int, default=None)
     p.add_argument("--truth", default=None, help="true classes of a demo video, from scripts/make_demo_video.py")
+    p.add_argument("--mirror", action="store_true",
+                   help="right-hand-drive car: flip each frame and swap the hand classes (decision D21)")
     a = p.parse_args()
     schedule = None
     if a.truth:
@@ -94,7 +96,8 @@ def main():
         for n, (frame, t) in enumerate(frames(a.source)):
             if a.max_frames is not None and n >= a.max_frames:
                 break
-            mean, k, distracted, alert = smoother.update(class_scores(model, prepare(frame, tf), device), t)
+            scores = class_scores(model, prepare(frame, tf, a.mirror), device)
+            mean, k, distracted, alert = smoother.update(scores[HAND_SWAP] if a.mirror else scores, t)
             now = time.perf_counter()
             fps = 1 / (now - last) if n == 0 else 0.9 * fps + 0.1 / (now - last)
             last = now

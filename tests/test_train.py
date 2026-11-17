@@ -76,7 +76,7 @@ def test_measure_counts_the_frames_after_the_warm_up():
     from ddd.speed import measure
     s = measure({"model": "resnet18", "input_size": 32}, torch.device("cpu"), frames=3, warmup=1)
     assert s["frames"] == 3 and s["frames_per_second"] > 0 and s["median_ms_per_frame"] > 0
-    assert s["parameters"] > 0 and s["weights_mb"] > 0
+    assert s["parameters"] > 0 and s["weights_mb"] > 0 and s["gpu_peak_memory_mb"] is None
 
 
 def test_pending_runs_skips_complete_runs(tmp_path):
@@ -197,3 +197,32 @@ def test_sched_after_epoch_follows_lightning(tmp_path):
         lrs = [float(r["lr"]) for r in csv.DictReader(f)]
     # Epoch 0 has the start value, and epoch 1 has the value of step 0. Both are the warm-up start.
     assert lrs == pytest.approx([cfg["warmup_lr"]] * 2)
+
+
+def test_change_image_keeps_the_size_and_changes_the_pixels():
+    from ddd.robust import CHANGES, change_image
+    img = Image.fromarray(np.random.default_rng(0).integers(60, 200, (48, 64, 3), dtype=np.uint8))
+    for kind, strengths in CHANGES.items():
+        out = change_image(img, kind, strengths[-1], np.random.default_rng(1))
+        assert out.size == img.size and out.mode == "RGB"
+        assert not np.array_equal(np.asarray(out), np.asarray(img)), kind
+    dark = np.asarray(change_image(img, "brightness", 0.2, None), dtype=float)
+    assert dark.mean() < np.asarray(img, dtype=float).mean()
+    covered = np.asarray(change_image(img, "cover", 0.3, np.random.default_rng(2)))
+    assert (covered == 128).all(axis=2).mean() == pytest.approx(0.3, abs=0.03)
+    with pytest.raises(ValueError):
+        change_image(img, "rain", 1.0, None)
+
+
+def test_evaluate_changes_opens_the_lock_one_time(tmp_path):
+    from ddd.robust import evaluate_changes
+    cfg = _tiny_data(tmp_path / "sf")
+    split = {"name": "tiny", "dev": ["p001"], "test": ["p002"], "folds": []}
+    (tmp_path / "sf" / "split.json").write_text(json.dumps(split), encoding="utf-8")
+    run_dir = run({**cfg, "fold": None}, tmp_path / "runs" / "tiny")
+    log = tmp_path / "log.csv"
+    out = evaluate_changes(run_dir, "unit test", tmp_path / "out", log, changes={"blur": [1.0], "cover": [0.2]})
+    assert [(r["change"], r["strength"]) for r in out["changes"]] == [("none", None), ("blur", 1.0), ("cover", 0.2)]
+    assert all(r["images"] == 4 for r in out["changes"])
+    with open(log, newline="", encoding="utf-8") as f:
+        assert len(list(csv.DictReader(f))) == 1

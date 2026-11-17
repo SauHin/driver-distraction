@@ -21,6 +21,9 @@ def measure(cfg, device, frames=50, warmup=10):
     tf = eval_transform(cfg.get("input_size", 224))
     img = Image.new("RGB", (640, 480), (90, 120, 150))
     times = []
+    cuda = torch.device(device).type == "cuda"
+    if cuda:
+        torch.cuda.reset_peak_memory_stats()
     with torch.inference_mode():
         for i in range(warmup + frames):
             t0 = time.perf_counter()
@@ -30,4 +33,5 @@ def measure(cfg, device, frames=50, warmup=10):
     return {"device": str(device), "frames": frames, "frames_per_second": frames / sum(times),
             "median_ms_per_frame": 1000 * statistics.median(times),
             "parameters": sum(p.numel() for p in model.parameters()),
-            "weights_mb": buf.tell() / 2**20}
+            "weights_mb": buf.tell() / 2**20,
+            "gpu_peak_memory_mb": torch.cuda.max_memory_allocated() / 2**20 if cuda else None}

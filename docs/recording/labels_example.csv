@@ -1,0 +1,5 @@
+start_seconds,end_seconds,class
+0.0,10.0,c0
+10.0,20.0,c1
+20.0,30.0,c0
+30.0,40.0,c6

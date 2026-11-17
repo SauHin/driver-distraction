@@ -1,3 +1,4 @@
 time_utc,git_commit,split,reason
 2026-11-15T14:15:28+00:00,f9c64dd1ee1f194f5fa8bceba556af10d9902dc4,statefarm_v2,"R1 replication, gate G1, seed 42, last epoch"
 2026-11-17T07:29:56+00:00,ff477a5dca17cb5d866352f6674b07f784ce0511,statefarm_v2,"Phase 3 final evaluation, model D19, seed 42, last epoch"
+2026-11-17T15:37:01+00:00,051f230e5151e2f78384812250b4c58052226299,statefarm_v2,"Phase 3 step 5, changed test images, model D19, last epoch"
