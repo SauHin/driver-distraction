@@ -13,7 +13,7 @@ from timm.data.constants import IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD  # n
 from ddd.data import eval_transform  # noqa: E402
 from ddd.development import gray_scores  # noqa: E402
 from ddd.evaluate import evaluate_run  # noqa: E402
-from ddd.metrics import binary_scores, class_scores, confusion, scores  # noqa: E402
+from ddd.metrics import binary_scores, bootstrap_accuracy, class_scores, confusion, scores  # noqa: E402
 from ddd.models import create, load_weights, set_trainable  # noqa: E402
 from ddd.train import optimizer, pending_runs, run  # noqa: E402
 
@@ -226,3 +226,10 @@ def test_evaluate_changes_opens_the_lock_one_time(tmp_path):
     assert all(r["images"] == 4 for r in out["changes"])
     with open(log, newline="", encoding="utf-8") as f:
         assert len(list(csv.DictReader(f))) == 1
+
+
+def test_bootstrap_accuracy_over_drivers():
+    lo, hi = bootstrap_accuracy([0.8, 0.8, 0.8], [10, 20, 30], reps=200)
+    assert lo == pytest.approx(0.8) and hi == pytest.approx(0.8)
+    lo, hi = bootstrap_accuracy([0.5, 1.0], [100, 100], reps=2000)
+    assert 0.5 <= lo < 0.75 < hi <= 1.0

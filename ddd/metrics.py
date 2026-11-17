@@ -35,6 +35,16 @@ def class_scores(m):
             for p, r, f in zip(precision, recall, f1)]
 
 
+def bootstrap_accuracy(accuracy, images, reps=10000, seed=0, level=0.95):
+    """A percentile interval of the pooled accuracy over drivers. Each repeat draws the drivers
+    with replacement and pools their correct images. `accuracy` and `images` hold one value per driver."""
+    acc, n = np.asarray(accuracy, dtype=np.float64), np.asarray(images, dtype=np.float64)
+    idx = np.random.default_rng(seed).integers(0, len(acc), (reps, len(acc)))
+    pooled = (acc[idx] * n[idx]).sum(axis=1) / n[idx].sum(axis=1)
+    lo, hi = np.quantile(pooled, [(1 - level) / 2, (1 + level) / 2])
+    return float(lo), float(hi)
+
+
 def binary_scores(m):
     """Precision, recall, and F1 of the status "distracted": classes c1 to c9 against c0.
     A distracted image with the wrong distracted class still has the correct status."""

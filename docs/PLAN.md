@@ -405,6 +405,7 @@ Rules for the application:
 
 Status on 2026-11-17: `app/live.py` and `ddd/live.py` do steps 1 to 7. `tests/test_live.py` holds the test of the frame preparation.
 `docs/recording/GUIDE.md` is the guide for the camera position and the recordings. The application did not read a camera in a car yet.
+`docs/recording/user_test.md` holds the plan and the forms of the user test.
 `scripts/make_demo_video.py` makes demo videos of the development drivers, with the true class of each part. No test driver is read.
 A demo video uses the fold model that did not train on that driver. The demo is not a result for the report.
 
@@ -438,7 +439,8 @@ Rules for the report:
 - Figures with persons come from own recordings with consent.
 
 Status on 2026-11-17: `docs/report/draft.md` holds a draft of sections 1 to 7, written by the AI from the result files.
-The owner checks and rewrites it. The figures, the bootstrap interval of section 5, and sections 8 to 10 are TBD.
+The owner checks and rewrites it. Sections 8 to 10 are TBD.
+`scripts/plot_figures.py` makes the figures in `results/figures/`. `scripts/bootstrap_drivers.py` gives the interval of section 5.
 
 ## 12. Schedule
 

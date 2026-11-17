@@ -13,6 +13,7 @@ dependencies = ["numpy", "pillow"]
 test = ["pytest"]
 train = ["torch", "torchvision", "timm"]
 app = ["opencv-python"]
+report = ["matplotlib"]
 
 [tool.setuptools]
 packages = ["ddd"]

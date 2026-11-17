@@ -80,7 +80,7 @@ Run the commands from the root of the repository. On Windows, use `.venv/Scripts
 
 ```
 python -m venv .venv
-python -m pip install -e ".[test,train,app]"
+python -m pip install -e ".[test,train,app,report]"
 python -m pytest -q
 python scripts/make_split.py
 python scripts/audit_statefarm.py
@@ -96,6 +96,8 @@ python scripts/record_speed.py runs/RUN_NAME --key laptop
 python app/live.py 0
 python app/live.py VIDEO.mp4 --no-show
 python scripts/make_demo_video.py all
+python scripts/plot_figures.py
+python scripts/bootstrap_drivers.py results/final/final_deit3_small_noflip_test_drivers.csv results/replication/r1_vit_s42_test_drivers.csv
 python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --truth data/demo/p014_truth.csv
 ```
 
@@ -120,6 +122,8 @@ python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --trut
 - `score_gray.py` scores the 3 fold runs on their validation drivers in color and in gray scale. It writes the tables of each class and each driver too.
 - `measure_speed.py` measures the processed frames per second of each config on this computer. It writes `results/development/speed_laptop.json`.
 - `evaluate_changes.py` scores a run on changed test images, for step 5 of PLAN section 9. Each call opens the test lock one time.
+- `plot_figures.py` makes the report figures in `results/figures/` from the result files.
+- `bootstrap_drivers.py` reads saved driver tables only. It does not open the test lock.
 - The options `--epochs`, `--max-steps`, and `--batch-size` of `train.py` are for speed measurements only.
 - Code that reads the test drivers calls `ddd.splits.drivers` with `unlock_test=True` and a reason.
 

@@ -1,0 +1,21 @@
+{
+  "reps": 10000,
+  "seed": 0,
+  "level": 0.95,
+  "runs": [
+    {
+      "table": "results/final/final_deit3_small_noflip_test_drivers.csv",
+      "drivers": 8,
+      "accuracy": 0.9196934865900384,
+      "interval_low": 0.8807394038461018,
+      "interval_high": 0.9514012185073664
+    },
+    {
+      "table": "results/replication/r1_vit_s42_test_drivers.csv",
+      "drivers": 8,
+      "accuracy": 0.89455938697318,
+      "interval_low": 0.8678554370323197,
+      "interval_high": 0.9238021638330758
+    }
+  ]
+}

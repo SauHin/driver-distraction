@@ -3,7 +3,7 @@
 Draft of 2026-11-17. The AI wrote this draft from the result files of the repository.
 The owner checks each section, rewrites it in the words of the team, and owns the final text (guideline sections 19 to 22).
 Each number comes from the result file that its section names. Each score is the value of the file times 100, with 2 decimals.
-"TBD" marks a part that waits for a result. Figures are TBD.
+"TBD" marks a part that waits for a result. `scripts/plot_figures.py` makes the figures in `results/figures/`.
 
 ## 1. Introduction
 
@@ -316,7 +316,9 @@ Both R1 scores reach the pass value 85.36. Thus gate G1 passed. The answer to RQ
 - Each development run with ImageNet weights fits the training images to a training accuracy of 99.92 or more in epoch 19.
 - The final model reaches a training accuracy of 99.98 in epoch 19 (`results/final/scores.md`).
 - DeiT-III Small with random weights stays at a training accuracy of 22.83 or less (`results/development/e2.md`).
-- [Figure TBD: the training and validation curves of B0 and of the final recipe on the 3 folds.]
+- Figure 1, `results/figures/b0_curves.png`: the training and validation curves of B0 on the 3 folds.
+- Figure 2, `results/figures/final_recipe_curves.png`: the same curves for the final recipe.
+- In both figures, the training accuracy is 98.18 or more in epoch 3. From epoch 3, the validation accuracy stays below it.
 
 ### 6.3 Validation results
 
@@ -351,7 +353,9 @@ Source: `results/final/scores.md`. The test lock opened for this evaluation afte
 | Status F1. | 97.78. | 96.94. | No value. |
 
 - The accuracy of the 8 test drivers is from 79.87 (p050) to 97.02 (p041).
-- A bootstrap interval over the test drivers is TBD (`docs/PLAN.md` section 5).
+- A bootstrap over the 8 test drivers gives a 95 percent interval of the accuracy (`results/final/bootstrap.json`).
+- The interval is 88.07 to 95.14 for the final model, and 86.79 to 92.38 for R1. The two intervals overlap.
+- Thus 8 test drivers do not show that the final model is better than R1 for all drivers.
 
 ### 6.5 Model comparison
 
@@ -364,6 +368,8 @@ Source: `results/development/e1.md`. FPS is the number of processed frames per s
 | ResNet-50. | 84.46. | 23,528,522. | 90.06. | 61.93. | 17.73. |
 | DeiT-III Small. | 88.34. | 21,678,346. | 82.76. | 61.96. | 18.52. |
 | DeiT-III Base. | 88.27. | 85,824,010. | 327.45. | 52.27. | 5.89. |
+
+Figure 3, `results/figures/e1_tradeoff.png`, shows the macro F1 against the CPU speed of each model.
 
 ### 6.6 Computational performance
 
@@ -437,7 +443,7 @@ Source: `results/final/robustness.md`.
 | Noise. | Standard deviation 40. | 90.05. |
 | Cover. | 30 percent of the image. | 47.24. |
 
-The status recall stays at 88.18 or more with each change.
+The status recall stays at 88.18 or more with each change. Figure 4, `results/figures/robustness.png`, shows the macro F1 of each change.
 
 ### 7.9 Limitations
 
