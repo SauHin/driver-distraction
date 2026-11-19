@@ -35,3 +35,9 @@ configs/e4_deit3_small_lr1e-4.json 2
 configs/e4_deit3_small_lr9e-4.json 0
 configs/e4_deit3_small_lr9e-4.json 1
 configs/e4_deit3_small_lr9e-4.json 2
+configs/e5_deit3_small_4drivers.json 0
+configs/e5_deit3_small_4drivers.json 1
+configs/e5_deit3_small_4drivers.json 2
+configs/e5_deit3_small_8drivers.json 0
+configs/e5_deit3_small_8drivers.json 1
+configs/e5_deit3_small_8drivers.json 2

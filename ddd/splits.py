@@ -73,6 +73,16 @@ def make_balanced_split(groups, images, test_drivers, n_folds=3):
     return {"test": test, "dev": dev, "folds": folds}
 
 
+def driver_subset(drivers, k, seed):
+    """The first `k` drivers after a shuffle of the sorted list with `seed` (decision P21).
+    A smaller `k` gives a part of the drivers of a larger `k`."""
+    order = sorted(drivers)
+    if not 0 < k <= len(order):
+        raise ValueError(f"cannot take {k} of {len(order)} drivers")
+    random.Random(seed).shuffle(order)
+    return sorted(order[:k])
+
+
 def load_split(path):
     with open(path, encoding="utf-8") as f:
         return json.load(f)

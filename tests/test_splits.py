@@ -5,7 +5,7 @@ import pytest
 
 from conftest import SPLIT_PATH, SPLIT_V1_PATH
 from ddd import REPO_ROOT
-from ddd.splits import load_split, make_balanced_split, make_split
+from ddd.splits import driver_subset, load_split, make_balanced_split, make_split
 
 # The public ViT-DD test list val_list_d_01.csv holds these drivers.
 PUBLIC_TEST = ["p002", "p012", "p026", "p035", "p041", "p045", "p050", "p075"]
@@ -79,3 +79,13 @@ def test_balanced_split_takes_smallest_range():
 def test_make_split_refuses_overlap():
     with pytest.raises(ValueError):
         make_split(["p001", "p002", "p003"], ["p003"], n_folds=3)
+
+
+def test_driver_subset_is_nested_and_fixed_by_the_seed():
+    drivers = [f"p{i:03d}" for i in range(12, 0, -1)]
+    four, eight = driver_subset(drivers, 4, 42), driver_subset(drivers, 8, 42)
+    assert len(four) == 4 and len(eight) == 8 and set(four) <= set(eight)
+    assert driver_subset(drivers, 4, 42) == four and driver_subset(sorted(drivers), 4, 42) == four
+    assert driver_subset(drivers, 12, 42) == sorted(drivers)
+    with pytest.raises(ValueError):
+        driver_subset(drivers, 13, 42)

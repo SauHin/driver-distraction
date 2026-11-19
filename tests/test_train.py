@@ -233,3 +233,18 @@ def test_bootstrap_accuracy_over_drivers():
     assert lo == pytest.approx(0.8) and hi == pytest.approx(0.8)
     lo, hi = bootstrap_accuracy([0.5, 1.0], [100, 100], reps=2000)
     assert 0.5 <= lo < 0.75 < hi <= 1.0
+
+
+def test_train_drivers_keeps_a_part_of_the_training_drivers(tmp_path):
+    from ddd.train import _parts
+    cfg = _tiny_data(tmp_path / "sf")
+    split = {"name": "tiny", "dev": ["p001", "p002", "p003"], "test": ["p009"],
+             "folds": [{"train": ["p001", "p003"], "val": ["p002"]}]}
+    (tmp_path / "sf" / "split.json").write_text(json.dumps(split), encoding="utf-8")
+    from ddd.splits import driver_subset
+    train, val = _parts({**cfg, "train_drivers": 1})
+    # p003 has no images in the tiny data, so the rows come from the kept driver if it is p001.
+    assert {r["subject"] for r in train} == {"p001"} & set(driver_subset(["p001", "p003"], 1, cfg["seed"]))
+    assert {r["subject"] for r in val} == {"p002"}
+    train_all, _ = _parts(cfg)
+    assert {r["subject"] for r in train_all} == {"p001"}

@@ -81,6 +81,8 @@ The owner can change each of these decisions.
 | P19 | Each own clip and each action of the continuous recording is about 10 seconds. | First value with no data. The owner can change it. See `docs/recording/GUIDE.md`. |
 | P20 | Step 5 of section 9 uses these strengths. Brightness and contrast: factors 0.6, 0.4, and 0.2. Blur: radius 1, 2, and 4 pixels. | Section 9 names the changes but no values. The owner can change them. `ddd/robust.py` holds them. |
 | P20, part 2 | Noise: standard deviation 10, 20, and 40 on the 0 to 255 scale. Cover: a gray square on 10, 20, and 30 percent of the image. | Same reason. |
+| P21 | E5 uses the final recipe, DeiT-III Small with no flip. A run keeps 4 or 8 of the 12 training drivers of its fold. | The owner asked for E5. The value 12 is the run `e3_deit3_small_noflip`. The validation drivers stay the same. |
+| P21, part 2 | The kept drivers are the first after a shuffle with seed 42. Thus the 4 drivers are a part of the 8 drivers. | `driver_subset` in `ddd/splits.py` does this. The epochs stay at 20, so a smaller part gives fewer steps. |
 
 ## 3. Data
 
@@ -329,6 +331,7 @@ Shared recipe of the development runs:
 - The ImageNet value of E2 and the paper-set value of E3 are the runs of `e1_deit3_small`.
 - Decision D18 adds `configs/e2_mobilenetv3_large_random.json`. Its ImageNet value is the runs of `e1_mobilenetv3_large`.
 - Decision P17 adds `configs/e4_deit3_small_lr1e-4.json` and `configs/e4_deit3_small_lr9e-4.json`.
+- Decision P21 adds `configs/e5_deit3_small_4drivers.json` and `configs/e5_deit3_small_8drivers.json`, with the config key `train_drivers`.
 - The config key `init_values` sets the start value of the layer scales of a ViT. Only the checks of `results/development/e2_checks.md` use it.
 - `scripts/summarize_folds.py` writes the scores of each fold and their mean to `results/development/`.
 - `scripts/score_gray.py` scores the fold runs on gray validation images. It measures the use of color by a model.

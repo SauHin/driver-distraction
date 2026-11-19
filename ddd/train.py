@@ -18,7 +18,7 @@ from torch.utils.data import DataLoader
 from ddd.data import StateFarmImages, eval_transform, train_transform
 from ddd.metrics import confusion, scores
 from ddd.models import create
-from ddd.splits import _git_commit, load_split
+from ddd.splits import _git_commit, driver_subset, load_split
 from ddd.statefarm import load_rows
 
 # train_accuracy is the share of correct augmented images during the epoch.
@@ -47,8 +47,11 @@ def _parts(cfg):
     csv_path = Path(cfg["data_root"]) / "driver_imgs_list.csv"
     if cfg.get("fold") is None:
         return load_rows(csv_path, split, "dev"), []
-    return (load_rows(csv_path, split, "train", cfg["fold"]),
-            load_rows(csv_path, split, "val", cfg["fold"]))
+    train = load_rows(csv_path, split, "train", cfg["fold"])
+    if cfg.get("train_drivers"):  # E5: a part of the training drivers of the fold
+        keep = set(driver_subset(split["folds"][cfg["fold"]]["train"], cfg["train_drivers"], cfg["seed"]))
+        train = [r for r in train if r["subject"] in keep]
+    return train, load_rows(csv_path, split, "val", cfg["fold"])
 
 
 def optimizer(model, cfg):
