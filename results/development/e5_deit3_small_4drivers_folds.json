@@ -1,0 +1,38 @@
+{
+  "config": "e5_deit3_small_4drivers",
+  "folds": [
+    {
+      "run": "e5_deit3_small_4drivers_f0",
+      "fold": 0,
+      "val_loss": 1.0374180265902844,
+      "val_accuracy": 0.8101528590300057,
+      "val_class_mean_accuracy": 0.7968847638500465,
+      "val_macro_f1": 0.7973359616633173,
+      "sum_epoch_seconds": 350.9
+    },
+    {
+      "run": "e5_deit3_small_4drivers_f1",
+      "fold": 1,
+      "val_loss": 1.0267912197328923,
+      "val_accuracy": 0.77985285795133,
+      "val_class_mean_accuracy": 0.7777707193096521,
+      "val_macro_f1": 0.7752782610530886,
+      "sum_epoch_seconds": 409.04
+    },
+    {
+      "run": "e5_deit3_small_4drivers_f2",
+      "fold": 2,
+      "val_loss": 1.1678710801350798,
+      "val_accuracy": 0.7390073598792225,
+      "val_class_mean_accuracy": 0.7372724095847422,
+      "val_macro_f1": 0.7245142217842973,
+      "sum_epoch_seconds": 371.19
+    }
+  ],
+  "mean": {
+    "val_loss": 1.077360108819419,
+    "val_accuracy": 0.7763376922868527,
+    "val_class_mean_accuracy": 0.7706426309148137,
+    "val_macro_f1": 0.7657094815002344
+  }
+}

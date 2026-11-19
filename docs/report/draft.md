@@ -272,10 +272,12 @@ Each experiment changes one variable and runs on the 3 folds.
 | E2. | Does pretraining help on new drivers? | Start weights. | ImageNet and random, for DeiT-III Small and MobileNetV3-Large. |
 | E3. | Does augmentation help? Does the flip hurt? | Augmentation. | None, the paper set, and the paper set with no flip. |
 | E4. | How sensitive is training to the learning rate? | Learning rate. | 0.0001, 0.0003, and 0.0009. |
+| E5. | How many drivers does training need? | Training drivers of each fold. | 4, 8, and 12. |
 
 - E1 trains all layers with label smoothing 0.1. The CNN models use the learning rate 0.001, the ViT models 0.0003.
 - The "None" value of E3 has no random step. The random crop becomes a center crop (decision P15).
 - E2 adds MobileNetV3-Large, because DeiT-III Small with random weights did not learn (decision D18).
+- E4 and E5 use the winner of E3. E5 keeps the first 4 or 8 drivers after a shuffle with seed 42 (decision P21).
 
 ### 5.4 Hyperparameters
 
@@ -338,6 +340,8 @@ Sources: the `_folds.json` files and the comparison files in `results/developmen
 | E3, DeiT-III Small, no flip. | 89.85. | 89.39. |
 | E4, no flip, learning rate 0.0001. | 86.82. | 86.80. |
 | E4, no flip, learning rate 0.0009. | 84.73. | 84.45. |
+| E5, no flip, 4 training drivers. | 77.63. | 76.57. |
+| E5, no flip, 8 training drivers. | 86.11. | 86.03. |
 
 ### 6.4 Test results
 
@@ -411,6 +415,9 @@ Sources: `results/development/b0_errors.md`, `results/development/e3_errors.md`,
 - Start weights (E2): ImageNet weights are necessary. With random weights, MobileNetV3-Large loses 38.34 points, and DeiT-III Small does not learn.
 - Augmentation (E3): with no augmentation, the macro F1 is 6.57 points lower. The flip does not help: with no flip, the macro F1 is 1.04 points higher.
 - Learning rate (E4): the default value 0.0003 is best. Three times the default costs 4.94 points, and one third costs 2.59 points.
+- Training drivers (E5): from 4 to 8 drivers, the macro F1 rises by 9.46 points. From 8 to 12 drivers, it rises by 3.36 points.
+- Thus more drivers help, and the score does not reach a limit at 12 drivers. Figure 5, `results/figures/e5_drivers.png`, shows this.
+- E5 changes the number of training steps too, because each run has 20 epochs (`results/development/e5.md`).
 
 ### 7.5 Strengths
 

@@ -84,6 +84,27 @@ def robustness(out):
     plt.close(fig)
 
 
+def drivers(out):
+    """E5: mean validation macro F1 against the number of training drivers, with the value of each fold."""
+    runs = {4: "e5_deit3_small_4drivers", 8: "e5_deit3_small_8drivers", 12: "e3_deit3_small_noflip"}
+    fig, ax = plt.subplots(figsize=(6.5, 4.2))
+    means = []
+    for n, cfg in runs.items():
+        s = json.loads((DEV / f"{cfg}_folds.json").read_text())
+        means.append(100 * s["mean"]["val_macro_f1"])
+        for k, f in enumerate(s["folds"]):
+            ax.scatter(n, 100 * f["val_macro_f1"], color=COLORS[k], s=18, label=f"fold {k}" if n == 4 else None)
+    ax.plot(list(runs), means, "-o", color="#1a1a1a", label="mean of the folds")
+    ax.set_xticks(list(runs))
+    ax.set(xlabel="Training drivers in each fold", ylabel="Validation macro F1 (%)",
+           title="E5: number of training drivers")
+    ax.grid(alpha=0.3)
+    ax.legend(fontsize=8)
+    fig.tight_layout()
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--out", default="results/figures")
@@ -94,6 +115,7 @@ def main():
     curves("e3_deit3_small_noflip", "Final recipe: DeiT-III Small, no flip, 3 folds", out / "final_recipe_curves.png")
     tradeoff(out / "e1_tradeoff.png")
     robustness(out / "robustness.png")
+    drivers(out / "e5_drivers.png")
     print(sorted(p.name for p in out.glob("*.png")))
 
 

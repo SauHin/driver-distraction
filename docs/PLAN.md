@@ -315,7 +315,7 @@ The guideline asks for a baseline and 2 more scenarios. The "Must" rows give a b
 | E3 | Does augmentation help? Does the flip hurt? | Augmentation. | None. The paper set. The paper set with no flip. | Must. |
 | E6 | Does the emotion task help? | Second task. | R1 and R2 of Phase 1. No new run. | Void after decision D9. |
 | E4 | How sensitive is training to the learning rate? | Learning rate. | The default, one third of it, and 3 times it. | Next. |
-| E5 | How many drivers does training need? | Number of train drivers. | 4, 8, and 12 drivers. | Next. |
+| E5 | How many drivers does training need? | Number of train drivers. | 4, 8, and 12 drivers. | Next. Done on 2026-11-20. See `results/development/e5.md`. |
 | E8 | Does smoothing help on video? | Smoothing window. | None. A majority vote. A moving mean. | Next. |
 | E7 | Which layers must train? | Trainable layers. | A linear head only. Attention layers only. All layers. | Last. |
 

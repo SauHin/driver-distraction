@@ -1,0 +1,14 @@
+{
+  "epoch": 19,
+  "lr": 7.34152255572697e-06,
+  "train_loss": 0.5015903665469243,
+  "train_accuracy": 1.0,
+  "train_images": 3328,
+  "epoch_seconds": 17.84,
+  "images_per_second": 186.51,
+  "gpu_peak_memory_mb": 8569,
+  "val_loss": 1.0374180265902844,
+  "val_accuracy": 0.8101528590300057,
+  "val_class_mean_accuracy": 0.7968847638500465,
+  "val_macro_f1": 0.7973359616633173
+}
