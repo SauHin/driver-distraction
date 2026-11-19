@@ -98,11 +98,15 @@ python app/live.py VIDEO.mp4 --no-show
 python scripts/make_demo_video.py all
 python scripts/plot_figures.py
 python scripts/bootstrap_drivers.py results/final/final_deit3_small_noflip_test_drivers.csv results/replication/r1_vit_s42_test_drivers.csv
-python app/live.py data/demo/p014.mp4 --run runs/e3_deit3_small_noflip_f0 --truth data/demo/p014_truth.csv
+python scripts/make_demo_video.py all --test
+python app/live.py --driver p002
 ```
 
 - `make_demo_video.py` makes a video of each development driver in `data/demo/`, with the classes c0 to c9 in order.
-- A demo video uses the fold model with that driver in its validation part. The script prints the run folder.
+- With `--test`, `make_demo_video.py` makes the videos of the test drivers. It opens the test lock one time (decision D23).
+- `app/live.py --driver p002` plays the demo video of one driver with its true classes. Each frame stays 0.5 seconds.
+- A test driver uses the final model. A development driver uses the fold model with that driver in its validation part.
+- Press space to pause a video. The option `--frame-seconds` changes the time of each frame.
 
 - `app/live.py` runs the live application on a camera number, a video file, or an image file. Press q to stop.
 - `app/live.py` reads `runs/final_deit3_small_noflip/` by default. Copy `config.json` and `last.pt` of that run from Drive.

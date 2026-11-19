@@ -76,6 +76,15 @@ def demo_rows(rows, driver, per_class):
     return out
 
 
+def demo_run(split, driver, final_run="runs/final_deit3_small_noflip"):
+    """The run folder of the model for the demo video of a driver. A development driver gets the fold
+    model that did not train on that driver. A test driver gets the final model (decision D23)."""
+    for k, fold in enumerate(split["folds"]):
+        if driver in fold["val"]:
+            return f"runs/e3_deit3_small_noflip_f{k}"
+    return final_run
+
+
 def true_class(schedule, t):
     """The class of a demo video at second `t`. `schedule` is a sorted list of (start second, class)."""
     i = bisect.bisect_right([s for s, _ in schedule], t) - 1

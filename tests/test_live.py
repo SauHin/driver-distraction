@@ -6,7 +6,7 @@ torch = pytest.importorskip("torch")
 pytest.importorskip("timm")
 
 from ddd.data import eval_transform  # noqa: E402
-from ddd.live import HAND_SWAP, Smoother, demo_rows, prepare, true_class  # noqa: E402
+from ddd.live import HAND_SWAP, Smoother, demo_rows, demo_run, prepare, true_class  # noqa: E402
 
 
 def test_prepare_equals_eval_transform_of_the_rgb_image():
@@ -65,3 +65,9 @@ def test_mirror_flips_the_frame_and_swaps_only_the_hand_classes():
     assert [int(_scores(k)[HAND_SWAP].argmax()) for k in (0, 5, 6, 7, 8, 9)] == [0, 5, 6, 7, 8, 9]
     # A second swap gives the first order back.
     assert [HAND_SWAP[i] for i in HAND_SWAP] == list(range(10))
+
+
+def test_demo_run_gives_a_test_driver_the_final_model():
+    split = {"folds": [{"val": ["p014"]}, {"val": ["p015"]}]}
+    assert demo_run(split, "p015") == "runs/e3_deit3_small_noflip_f1"
+    assert demo_run(split, "p002", "runs/final") == "runs/final"

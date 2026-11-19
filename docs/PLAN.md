@@ -50,6 +50,7 @@ The research questions are:
 | D20 | 2026-11-17 | Step 5 of section 9, the changed test images, is part of the final evaluation. | Choice of the owner among 2 options. Section 9 lists step 5 in the final evaluation. No design choice uses its scores. |
 | D21 | 2026-11-17 | In a right-hand-drive car, the app flips each frame left to right. Then it swaps the scores of `c1` and `c3`, and of `c2` and `c4`. | Choice of the owner among 3 options. StateFarm cars have the wheel on the left. The final model trained with no flip. |
 | D22 | 2026-11-17 | A phone is the camera. For the live test, the phone is a webcam of the laptop. | Choice of the owner among 3 options. |
+| D23 | 2026-11-19 | The demo of the application can show the 8 test drivers with the final model. The demo is not a result for the report. | Choice of the owner among 3 options. The final model trained on all development drivers. The final scores were complete before this demo. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -160,6 +161,8 @@ The test lock has these rules:
 - Each unlock writes a row to `results/test_access_log.csv`. The row holds the time, the git commit, and the reason.
 - Status on 2026-11-17: the log holds the rows of R1 and of the final test evaluation.
 - Decision D20: step 5 of section 9 is part of the final evaluation. Each of its runs adds a row with the reason "Phase 3 step 5".
+- Decision D23: the demo videos of the test drivers open the lock one time. Their row has the reason "Phase 4 demo videos".
+- The demo of the test drivers gives no score. No smoothing value or alert time changes because of this demo.
 - No design choice reads a score of the test drivers.
 - The own test persons follow the same lock. Only the final evaluation scores them.
 
@@ -406,8 +409,11 @@ Rules for the application:
 Status on 2026-11-17: `app/live.py` and `ddd/live.py` do steps 1 to 7. `tests/test_live.py` holds the test of the frame preparation.
 `docs/recording/GUIDE.md` is the guide for the camera position and the recordings. The application did not read a camera in a car yet.
 `docs/recording/user_test.md` holds the plan and the forms of the user test.
-`scripts/make_demo_video.py` makes demo videos of the development drivers, with the true class of each part. No test driver is read.
-A demo video uses the fold model that did not train on that driver. The demo is not a result for the report.
+`scripts/make_demo_video.py` makes demo videos of the development drivers, with the true class of each part.
+With `--test`, the script makes the videos of the 8 test drivers (decision D23). It opens the test lock one time.
+A demo video of a development driver uses the fold model that did not train on that driver. A test driver uses the final model.
+`app/live.py --driver` selects a demo video. Each frame stays 0.5 seconds on the screen. The space key pauses the video.
+The demo is not a result for the report.
 
 User test:
 
