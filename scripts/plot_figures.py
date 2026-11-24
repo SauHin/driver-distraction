@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import matplotlib
+import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -105,6 +106,30 @@ def drivers(out):
     plt.close(fig)
 
 
+def confusion(out):
+    """Confusion matrices of the final recipe: the 3 validation folds together, and the test drivers.
+    The color is the share of the true class. The number is the count of images. An empty cell is 0."""
+    files = {"Validation drivers, 3 fold models": DEV / "e3_deit3_small_noflip_val_confusion_color.csv",
+             "Test drivers, final model": FINAL / "final_deit3_small_noflip_test_confusion.csv"}
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5.4))
+    for ax, (title, path) in zip(axes, files.items()):
+        with open(path, newline="", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        codes = rows[0][1:]
+        m = np.array([[int(v) for v in r[1:]] for r in rows[1:]])
+        share = m / m.sum(1, keepdims=True)
+        ax.imshow(share, cmap="Blues", vmin=0, vmax=1)
+        for i, j in zip(*np.nonzero(m)):
+            ax.text(j, i, m[i, j], ha="center", va="center", fontsize=7,
+                    color="white" if share[i, j] > 0.5 else "black")
+        ax.set_xticks(range(len(codes)), codes)
+        ax.set_yticks(range(len(codes)), codes)
+        ax.set(xlabel="Prediction", ylabel="True class", title=f"{title}, {m.sum()} images")
+    fig.tight_layout()
+    fig.savefig(out, dpi=150)
+    plt.close(fig)
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--out", default="results/figures")
@@ -116,6 +141,7 @@ def main():
     tradeoff(out / "e1_tradeoff.png")
     robustness(out / "robustness.png")
     drivers(out / "e5_drivers.png")
+    confusion(out / "confusion.png")
     print(sorted(p.name for p in out.glob("*.png")))
 
 

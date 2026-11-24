@@ -51,6 +51,7 @@ The research questions are:
 | D21 | 2026-11-17 | In a right-hand-drive car, the app flips each frame left to right. Then it swaps the scores of `c1` and `c3`, and of `c2` and `c4`. | Choice of the owner among 3 options. StateFarm cars have the wheel on the left. The final model trained with no flip. |
 | D22 | 2026-11-17 | A phone is the camera. For the live test, the phone is a webcam of the laptop. | Choice of the owner among 3 options. |
 | D23 | 2026-11-19 | The demo of the application can show the 8 test drivers with the final model. The demo is not a result for the report. | Choice of the owner among 3 options. The final model trained on all development drivers. The final scores were complete before this demo. |
+| D24 | 2026-11-24 | The lecturer approved the topic. The deadline is about the second or third week of December 2026. The exact date is TBD. | Answer of the owner. |
 
 The owner also selected 9 distraction classes for DMD on 2026-11-13. This choice is void because of D1.
 
@@ -453,7 +454,7 @@ The owner checks and rewrites it. Sections 8 to 10 are TBD.
 
 ## 12. Schedule
 
-The exact deadline is TBD. Week 4 depends on the deadline.
+Decision D24: the deadline is about the second or third week of December 2026. The exact date is TBD.
 
 | Week | Dates | Work | Complete after |
 |---|---|---|---|
@@ -520,10 +521,13 @@ runs/         run folders, not in git
 
 ## 16. Open points for the owner
 
-- The lecturer approved exam cheating detection. The approval of the new topic is open.
+- Decision D24: the lecturer approved the new topic.
 - The answer of the lecturer about the StateFarm rules is open.
 - The exact deadline and the report language are TBD.
 - The number of persons for the own recordings and the user test is TBD.
+- Plan of the owner on 2026-11-24, not final: the persons of the user test try the application on the test data. They do not record in a car.
+- Plan of the owner on 2026-11-24, not final: the team members record the own videos. The application reads them as an extra input.
+- Point for this plan: decision D23 says that the demo is not a result for the report. The answers of the user test are a result for report section 8.
 - Decision P3 counts "talking to passenger" as distracted. The owner can change this.
 - Decision P7 selects a desktop program. The owner can ask for a web page.
 - Decision P8 sets the speed target. The owner can change the number.

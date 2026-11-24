@@ -1,9 +1,10 @@
 # Driver distraction detection with a camera: technical report (draft)
 
-Draft of 2026-11-17. The AI wrote this draft from the result files of the repository.
+Draft of 2026-11-17, with additions on 2026-11-20 and 2026-11-24. The AI wrote this draft from the result files of the repository.
 The owner checks each section, rewrites it in the words of the team, and owns the final text (guideline sections 19 to 22).
 Each number comes from the result file that its section names. Each score is the value of the file times 100, with 2 decimals.
 "TBD" marks a part that waits for a result. `scripts/plot_figures.py` makes the figures in `results/figures/`.
+A source outside the repository has an author and a year, for example (Touvron et al. 2022). The list "References" at the end gives each source.
 
 ## 1. Introduction
 
@@ -46,11 +47,29 @@ The project answers five research questions (`docs/PLAN.md` section 1):
 - A desktop program on a laptop. It is a demonstration, not a safety system for the road.
 - Tests in a parked car only.
 
+### 1.7 Proposed solution and why deep learning
+
+The proposed solution is an image classifier with a live application on a laptop. Section 4 gives the design.
+
+- The 10 classes differ in small details: the hand that holds a phone, a cup at the mouth, or a head turned to the side.
+- These details change with each person, car, and light. Thus rules written by hand need a separate description for each case.
+- A deep learning model learns these details from labeled images. With ImageNet start weights, the final model reaches a test accuracy of 91.97 on 8 new drivers (section 6.4).
+- With random start weights, DeiT-III Small does not learn, and MobileNetV3-Large loses 38.34 points (section 7.4). Thus the solution uses transfer learning.
+- The final model processes 16.30 frames per second on the laptop CPU (section 6.6). Thus it fits a live application.
+
+### 1.8 Usage scenario
+
+- A camera sits at the passenger side of the car. It sees the driver from the side, as the StateFarm camera does (`docs/recording/GUIDE.md`).
+- A laptop in the car runs the application. The application shows the status and the class of each frame.
+- If the distracted status lasts 2.0 seconds, the application gives an alert (decision P18).
+- The application also reads a video file or an image file, for a demonstration or a review of a recording.
+- The project records persons in a parked car only. The application is a demonstration, not a safety system for the road.
+
 ## 2. Dataset and Data Preparation
 
 ### 2.1 Dataset source
 
-The dataset is StateFarm Distracted Driver Detection from Kaggle, under the competition rules.
+The dataset is StateFarm Distracted Driver Detection from Kaggle, under the competition rules (State Farm n.d.).
 The project does not share its files. The images and data from them stay out of git and out of public material.
 
 ### 2.2 Dataset characteristics
@@ -103,7 +122,7 @@ Training adds random steps, the augmentation of the ViT-DD code (`results/vitdd_
 
 1. A random crop of 224 by 224 pixels, with a padding of 4 pixels by reflection.
 2. A random horizontal flip. The final model has no flip (decision P16).
-3. One of three steps by random choice: gray scale, solarization, or Gaussian blur (3-Augment).
+3. One of three steps by random choice: gray scale, solarization, or Gaussian blur. This is 3-Augment of DeiT III (Touvron et al. 2022).
 4. A color jitter of 0.3 for brightness, contrast, and saturation.
 
 ### 2.6 Train, validation, and test split
@@ -130,19 +149,29 @@ StateFarm, 26 drivers
 - The cars have the wheel on the left. Cars in Indonesia have the wheel on the right, so the camera view is a mirror (decision D21).
 - The dataset has no night images and no infrared images.
 
+### 2.8 Potential bias
+
+- The label file gives the driver, the class, and the image name only. It gives no age, sex, or skin color of a driver.
+- Thus the project cannot measure a difference of the scores between groups of persons.
+- 26 drivers is a small group of persons. The drivers form two scene groups, a car or a camera position (`docs/PLAN.md` section 4).
+- The test drivers share these scene groups with the development drivers. Thus the scores do not show the effect of a new car.
+- A truck pulled the car during the recording (`docs/PLAN.md` section 3.1). Thus the drivers acted the classes and did not drive.
+- Acted actions can differ from the distraction of a real driver.
+- The scores differ between persons. On the test, p050 has an accuracy of 79.87, and p041 has 97.02 (section 6.4). The cause is not known.
+
 ## 3. Deep Learning Fundamentals and Model
 
 ### 3.1 Relevant theoretical concepts
 
 - A convolutional network (CNN) finds local patterns with small filters. Its layers grow the area that each unit sees.
-- A vision transformer (ViT) cuts the image into patches of 16 by 16 pixels. Each patch becomes a vector, a token.
+- A vision transformer (ViT) cuts the image into patches of 16 by 16 pixels. Each patch becomes a vector, a token (Dosovitskiy et al. 2020).
 - Self-attention lets each token use all other tokens. Thus the model can join the hands, the face, and the wheel in one step.
 - A class token collects the result. A linear head turns it into 10 class scores.
-- Transfer learning starts from weights that learned on ImageNet. The training then fits these weights to the new task.
+- Transfer learning starts from weights that learned on ImageNet (Russakovsky et al. 2014). The training then fits these weights to the new task.
 
 ### 3.2 Selected architecture
 
-The final model is DeiT-III Small, the model `deit3_small_patch16_224.fb_in1k` of `timm` 1.0.31.
+The final model is DeiT-III Small (Touvron et al. 2022), the model `deit3_small_patch16_224.fb_in1k` of `timm` 1.0.31 (Wightman n.d.).
 
 - Input: one RGB image of 224 by 224 pixels, thus 196 patches.
 - Parameters: 21,678,346. Size of the weights: 82.76 MB (`results/final/cost.md`).
@@ -150,19 +179,25 @@ The final model is DeiT-III Small, the model `deit3_small_patch16_224.fb_in1k` o
 
 ### 3.3 Model components
 
-- A patch embedding: a linear layer that turns each 16 by 16 patch into a token.
-- A position embedding: one learned vector for each patch place.
-- 12 transformer blocks. Each block has self-attention and a small feed-forward network, each with a layer scale.
-- A layer norm and a linear head with 10 outputs.
+Source: the model of `timm` 1.0.31 on the laptop, printed on 2026-11-24.
+
+- A patch embedding: a convolution with a 16 by 16 kernel and a stride of 16. It turns each patch into a token of 384 numbers.
+- A class token and a position embedding. The position embedding is one learned vector for each of the 196 patch places.
+- 12 transformer blocks. Each block has self-attention with 6 heads and a feed-forward network with 1536 hidden units.
+- In each block, a layer norm comes before each part. A layer scale multiplies the output of each part (Touvron et al. 2021).
+- A residual connection adds the output of each part to the input of that part.
+- The activation function of the feed-forward network is GELU (Hendrycks and Gimpel 2016).
+- A final layer norm and a linear head with 10 outputs. A softmax turns the 10 outputs into class scores.
 
 ### 3.4 Loss function
 
-The loss is cross entropy with label smoothing 0.1. Label smoothing moves a small part of the target to the other classes.
+The loss is cross entropy with label smoothing 0.1 (Szegedy et al. 2015). Label smoothing moves a small part of the target to the other classes.
 It keeps the model from scores that are too sure. The replication R1 and the baseline B0 have no label smoothing.
 
 ### 3.5 Optimizer
 
-AdamW with the learning rate 0.0003 and the weight decay 0.1. Experiment E4 compares 0.0001, 0.0003, and 0.0009.
+AdamW with the learning rate 0.0003 and the weight decay 0.1 (Loshchilov and Hutter 2019).
+AdamW applies the weight decay to the weights apart from the adaptive gradient step of Adam. Experiment E4 compares 0.0001, 0.0003, and 0.0009.
 
 ### 3.6 Training strategy
 
@@ -177,6 +212,7 @@ AdamW with the learning rate 0.0003 and the weight decay 0.1. Experiment E4 comp
 | Seed. | 42. |
 | Checkpoint. | After each epoch. A run continues after a disconnect. |
 
+The warm-up follows Goyal et al. (2017), and the cosine curve follows Loshchilov and Hutter (2017).
 The score of a run is the score of its last epoch (decision P12). No epoch is selected with validation or test scores.
 
 ### 3.7 Why the model was selected
@@ -185,6 +221,24 @@ The score of a run is the score of its last epoch (decision P12). No epoch is se
 - It reaches the live target of 5 frames per second on the laptop CPU and GPU (decision P8).
 - With the paper set and no flip, its mean macro F1 is 89.39, the highest of all development runs (`results/development/e3.md`).
 - The rules of `docs/PLAN.md` section 8.5 select it as `best` and as `live`. The owner approved it (decision D19).
+
+### 3.8 Pretrained model
+
+The guideline asks for these points about a pretrained model.
+
+- Architecture: DeiT-III Small, a ViT with 12 blocks, tokens of 384 numbers, and 6 attention heads (section 3.3).
+- Pretraining objective: supervised classification. DeiT III trains ViT models with class labels on ImageNet-1k (Touvron et al. 2022).
+- Pretraining data: ImageNet-1k, a set of photos in 1000 classes (Russakovsky et al. 2014). The model card of `timm` names this dataset.
+- ImageNet-1k does not hold the 10 classes of this project. Thus the model learns these classes from the 18 development drivers only.
+- Fine-tuning strategy: a new linear head with 10 outputs replaces the head with 1000 outputs. Then all layers train with the values of section 3.6.
+- Layers used: all layers of the pretrained model except its head. The new head starts from random weights.
+- Why the model fits: in E1, it has the highest mean macro F1 of five models (section 3.7). In E2, its ImageNet weights are necessary (section 7.4).
+
+Limits of the pretrained model:
+
+- The model takes a square input of 224 by 224 pixels. Thus the center crop keeps only the middle 480 of the 640 columns of a frame.
+- The resize from 480 to 224 pixels makes each detail less than half as large in pixels. A small object, for example a phone, gets few pixels.
+- Without pretrained weights, DeiT-III Small does not learn in 20 epochs (E2). Thus the model depends on the ImageNet weights.
 
 ## 4. System Design and Implementation
 
@@ -226,8 +280,8 @@ results/*.json, *.csv, *.md                    screen and CSV log
 
 ### 4.4 Development framework
 
-- PyTorch and torchvision for the training and the inference.
-- `timm` 1.0.31 for the models and the start weights.
+- PyTorch (Paszke et al. 2019) and torchvision for the training and the inference.
+- `timm` 1.0.31 for the models and the start weights (Wightman n.d.).
 - OpenCV for the camera, the video, and the screen of the app.
 - NumPy and Pillow for the data steps. Pytest for the tests.
 
@@ -247,7 +301,7 @@ The Colab runtime used about 1.94 compute units per hour (`results/compute/first
 - Each run reads one config file. Its folder holds the config, the history of each epoch, the metrics, the GPU type, the library versions, and the git commit.
 - A queue script trains the runs one at a time and skips each complete run.
 - A short check cell runs at least every 30 minutes during a Colab job, because Colab can stop an idle runtime (decision D14).
-- The repository has 49 tests. They cover the split by driver, the test lock, the metrics, the training loop, and the app input.
+- The repository has 54 tests. They cover the split by driver, the test lock, the metrics, the training loop, and the app input.
 
 ## 5. Experimental Methodology
 
@@ -257,7 +311,7 @@ See section 1.5. RQ1 is the replication. RQ2 and RQ3 are the experiments of Phas
 
 ### 5.2 Baseline
 
-- R1, the replication: the standard ViT of the ViT-DD paper, a DeiT-III Base model, on the 18 development drivers.
+- R1, the replication: the standard ViT of the ViT-DD paper (Ma and Wang 2022), a DeiT-III Base model, on the 18 development drivers.
 - R1 trains the attention layers, the head, and the position embedding only, as the ViT-DD code does.
 - B0, the development baseline: the R1 recipe on each of the 3 folds.
 - `results/replication/r1_vit_s42/recipe_differences.md` lists the differences from the paper recipe. The main one: no face input and no emotion head (decision D10).
@@ -274,6 +328,7 @@ Each experiment changes one variable and runs on the 3 folds.
 | E4. | How sensitive is training to the learning rate? | Learning rate. | 0.0001, 0.0003, and 0.0009. |
 | E5. | How many drivers does training need? | Training drivers of each fold. | 4, 8, and 12. |
 
+- The E1 models come from He et al. (2015), Howard et al. (2019), Tan and Le (2019), and Touvron et al. (2022).
 - E1 trains all layers with label smoothing 0.1. The CNN models use the learning rate 0.001, the ViT models 0.0003.
 - The "None" value of E3 has no random step. The random crop becomes a center crop (decision P15).
 - E2 adds MobileNetV3-Large, because DeiT-III Small with random weights did not learn (decision D18).
@@ -361,19 +416,41 @@ Source: `results/final/scores.md`. The test lock opened for this evaluation afte
 - The interval is 88.07 to 95.14 for the final model, and 86.79 to 92.38 for R1. The two intervals overlap.
 - Thus 8 test drivers do not show that the final model is better than R1 for all drivers.
 
+The F1 of each class on the test drivers:
+
+| Class | F1 |
+|---|---|
+| `c0`, safe driving. | 83.11. |
+| `c1`, texting, right hand. | 92.87. |
+| `c2`, phone call, right hand. | 98.56. |
+| `c3`, texting, left hand. | 96.65. |
+| `c4`, phone call, left hand. | 97.47. |
+| `c5`, radio. | 98.21. |
+| `c6`, drinking. | 98.20. |
+| `c7`, reaching behind. | 97.35. |
+| `c8`, hair and makeup. | 82.58. |
+| `c9`, talking to passenger. | 68.01. |
+
+Figure 3, `results/figures/confusion.png`, shows the confusion matrix of the validation drivers and of the test drivers.
+
+- On the left, each fold model scores the 6 drivers that it did not train on. Together, the 3 folds cover the 18 development drivers.
+- On the right, the final model scores the 8 test drivers.
+- The color gives the share of the true class. The number gives the count of images. An empty cell is 0.
+
 ### 6.5 Model comparison
 
 Source: `results/development/e1.md`. FPS is the number of processed frames per second on the laptop.
 
-| Model | Macro F1 | Parameters | MB | GPU FPS | CPU FPS |
-|---|---|---|---|---|---|
-| MobileNetV3-Large. | 79.21. | 4,214,842. | 16.27. | 50.27. | 43.51. |
-| EfficientNet-B0. | 75.72. | 4,020,358. | 15.62. | 50.17. | 35.52. |
-| ResNet-50. | 84.46. | 23,528,522. | 90.06. | 61.93. | 17.73. |
-| DeiT-III Small. | 88.34. | 21,678,346. | 82.76. | 61.96. | 18.52. |
-| DeiT-III Base. | 88.27. | 85,824,010. | 327.45. | 52.27. | 5.89. |
+| Model | Macro F1 | Train seconds | Parameters | MB | GPU FPS | CPU FPS |
+|---|---|---|---|---|---|---|
+| MobileNetV3-Large. | 79.21. | 587.91 to 595.94. | 4,214,842. | 16.27. | 50.27. | 43.51. |
+| EfficientNet-B0. | 75.72. | 687.48 to 688.40. | 4,020,358. | 15.62. | 50.17. | 35.52. |
+| ResNet-50. | 84.46. | 1079.33 to 1079.67. | 23,528,522. | 90.06. | 61.93. | 17.73. |
+| DeiT-III Small. | 88.34. | 1046.61 to 1047.44. | 21,678,346. | 82.76. | 61.96. | 18.52. |
+| DeiT-III Base. | 88.27. | 2926.32 to 2927.74. | 85,824,010. | 327.45. | 52.27. | 5.89. |
 
-Figure 3, `results/figures/e1_tradeoff.png`, shows the macro F1 against the CPU speed of each model.
+"Train seconds" is the sum of the epoch times of one fold run on the Colab L4. The range covers the 3 folds.
+Figure 4, `results/figures/e1_tradeoff.png`, shows the macro F1 against the CPU speed of each model.
 
 ### 6.6 Computational performance
 
@@ -399,6 +476,8 @@ Source: `results/development/b0_fit.md`.
 - Thus the curves show no classic overfit. The gap is a gap to new drivers.
 - An early stop by the lowest validation loss gives no reliable gain. Its difference of 0.90 points is smaller than the change between two epochs.
 - No model with ImageNet weights underfits. DeiT-III Small with random weights does not learn, a strong underfit.
+- The learning rate is small in epochs 15 to 19, and the B0 scores of these epochs are stable (`results/development/b0_fit.md`). Thus the B0 runs converge before the last epoch.
+- The classes are near balance (section 2.3). The training uses no class weights.
 
 ### 7.3 Error patterns
 
@@ -408,6 +487,16 @@ Sources: `results/development/b0_errors.md`, `results/development/e3_errors.md`,
 - The model gives the class "hair and makeup" to other classes with a hand near the face. On the test drivers, 210 images get this wrong class.
 - On the validation folds, the left and right hand classes give almost no errors. On the test drivers, 24 images of `c1` have the prediction `c3`.
 - The scores differ much between drivers. On the folds, p072 has the lowest accuracy of the final recipe, 60.40.
+
+The table gives the largest confusions on the test drivers. Figure 3 shows the full matrices.
+Each cause comes from `results/development/b0_errors.md`. The AI looked at no image, so each cause is a probable cause only.
+
+| True class | Prediction | Test images | Probable cause |
+|---|---|---|---|
+| `c9`, talking to passenger. | `c0`, safe driving. | 134. | Both classes show the hands on the wheel. They differ mainly in the direction of the head. |
+| `c0`, safe driving. | `c9`, talking to passenger. | 45. | The same pair in the other direction. |
+| All other classes. | `c8`, hair and makeup. | 210. | `c8` shows a hand near the face or the head. Drinking and phone calls show this too. |
+| `c1`, texting, right hand. | `c3`, texting, left hand. | 24. | Not known. The validation folds gave no such error. |
 
 ### 7.4 Effect of the training scenarios
 
@@ -450,7 +539,7 @@ Source: `results/final/robustness.md`.
 | Noise. | Standard deviation 40. | 90.05. |
 | Cover. | 30 percent of the image. | 47.24. |
 
-The status recall stays at 88.18 or more with each change. Figure 4, `results/figures/robustness.png`, shows the macro F1 of each change.
+The status recall stays at 88.18 or more with each change. Figure 6, `results/figures/robustness.png`, shows the macro F1 of each change.
 
 ### 7.9 Limitations
 
@@ -461,7 +550,60 @@ The status recall stays at 88.18 or more with each change. Figure 4, `results/fi
 
 ## 8. Real-World Evaluation
 
-TBD. This section waits for the own recordings and the user test (`docs/recording/GUIDE.md`, `docs/PLAN.md` section 10).
+The own recordings and the user test are TBD. This section gives the parts that need no own recordings.
+
+### 8.1 Target users and stakeholders
+
+Section 1.3 gives the target users and stakeholders.
+
+### 8.2 Evaluation scenario
+
+TBD. The plan of the user test is not final (`docs/PLAN.md` section 16).
+
+### 8.3 User and practical feedback
+
+TBD. This section reports only the answers of real sessions.
+
+### 8.4 Usefulness
+
+TBD. This section waits for the user test.
+
+### 8.5 Practical limitations
+
+- The application did not read a camera in a car yet.
+- The StateFarm cars have the wheel on the left. In a car with the wheel on the right, the application flips each frame (decision D21). The effect of the flip is not measured.
+- The application cuts a square from the middle of each frame. A frame that is wider than 4:3 loses more of its sides (`docs/recording/GUIDE.md`).
+- The smoothing window of 5 frames and the alert time of 2.0 seconds are first values with no data (decision P18).
+- The dataset has no night images and no infrared images (section 2.7). The behavior at night is not measured.
+- Talking to a passenger gives most of the missed alerts (section 7.6).
+
+### 8.6 Deployment considerations
+
+- Hardware: the final model needs no GPU. The laptop CPU processes 16.30 frames per second, above the target of 5 (`results/final/cost.md`).
+- Size: the weights are 82.76 MB. The peak GPU memory of the speed test is 95.74 MB.
+- Camera: the camera must see the driver from the passenger side, as in StateFarm. `docs/recording/GUIDE.md` gives the position.
+- Cars with the wheel on the right: the option `--mirror` flips each frame and swaps the hand classes (decision D21).
+- Privacy: the code of the application has no network part. The log holds the scores of each frame and no image.
+- Consent: each recorded person signs a consent form (`docs/recording/consent_form.md`).
+- Data rules: the StateFarm rules limit the use of the data to the competition (`docs/LITERATURE.md`). A use of the model outside this course needs a check of these rules.
+- License: the model card of `timm` gives the Apache-2.0 license for the start weights of DeiT-III Small.
+- Safety: the application is a demonstration, not a safety system for the road.
+
+### 8.7 Scalability
+
+- Each car runs its own copy of the model on its own computer. Thus more cars add no load to a central server.
+- Each epoch reads the training images one time. Thus the training time grows with the number of training images.
+- The final model trained in 1611.57 seconds of epoch time on the Colab L4, with 18 drivers (section 6.6).
+- More training drivers give a higher score. From 8 to 12 drivers, the mean validation macro F1 rises by 3.36 points (section 7.4).
+- The score does not reach a limit at 12 drivers. Thus data of more drivers can raise the score further.
+- A new type of car or camera position needs new data. The test measures new persons in known cars only (section 2.7).
+
+### 8.8 Practical suitability
+
+- On the laptop, the model with the best validation score also reaches the speed target. Thus `best` and `live` are one model (decision D19).
+- DeiT-III Base has a mean macro F1 of 88.27, near that of DeiT-III Small. Its CPU speed is 5.89 frames per second, near the target of 5 (`results/development/e1.md`).
+- For a device slower than the laptop, MobileNetV3-Large processes 43.51 frames per second on the CPU. Its mean macro F1 is 9.13 points lower (79.21 against 88.34).
+- The behavior of the final model on own recordings is TBD (`docs/PLAN.md` section 9, step 4).
 
 ## 9. Conclusion
 
@@ -470,3 +612,26 @@ TBD. This section waits for section 8.
 ## 10. AI Usage Declaration
 
 TBD. The owner writes this section from `docs/AI_LOG.md`, with the cells marked `OWNER`.
+
+## References
+
+The AI read each arXiv page on 2026-11-24 for the title, the authors, and the year. If the arXiv page names a venue, the list gives it.
+Each source is free to read. An arXiv number opens at `https://arxiv.org/abs/<number>`. The owner selects the final style of this list.
+
+- Dosovitskiy, A., et al. (2020). An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale. arXiv:2010.11929. The page names the ICLR camera-ready version.
+- Goyal, P., et al. (2017). Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour. arXiv:1706.02677.
+- He, K., Zhang, X., Ren, S., and Sun, J. (2015). Deep Residual Learning for Image Recognition. arXiv:1512.03385.
+- Hendrycks, D., and Gimpel, K. (2016). Gaussian Error Linear Units (GELUs). arXiv:1606.08415.
+- Howard, A., et al. (2019). Searching for MobileNetV3. ICCV 2019. arXiv:1905.02244.
+- Loshchilov, I., and Hutter, F. (2017). SGDR: Stochastic Gradient Descent with Warm Restarts. ICLR 2017. arXiv:1608.03983.
+- Loshchilov, I., and Hutter, F. (2019). Decoupled Weight Decay Regularization. ICLR 2019. arXiv:1711.05101.
+- Ma, Y., and Wang, Z. (2022). ViT-DD: Multi-Task Vision Transformer for Semi-Supervised Driver Distraction Detection. arXiv:2209.09178.
+- Paszke, A., et al. (2019). PyTorch: An Imperative Style, High-Performance Deep Learning Library. NeurIPS 2019. arXiv:1912.01703.
+- Russakovsky, O., et al. (2014). ImageNet Large Scale Visual Recognition Challenge. arXiv:1409.0575.
+- State Farm (n.d.). State Farm Distracted Driver Detection. Kaggle competition. <https://www.kaggle.com/competitions/state-farm-distracted-driver-detection>.
+- Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., and Wojna, Z. (2015). Rethinking the Inception Architecture for Computer Vision. arXiv:1512.00567.
+- Tan, M., and Le, Q. V. (2019). EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. ICML 2019. arXiv:1905.11946.
+- Touvron, H., Cord, M., Sablayrolles, A., Synnaeve, G., and Jégou, H. (2021). Going deeper with Image Transformers. arXiv:2103.17239.
+- Touvron, H., Cord, M., and Jégou, H. (2022). DeiT III: Revenge of the ViT. arXiv:2204.07118.
+- Wightman, R. (n.d.). PyTorch Image Models (timm). GitHub repository. <https://github.com/huggingface/pytorch-image-models>.
+- TBD: a source for the bootstrap method of section 6.4.
